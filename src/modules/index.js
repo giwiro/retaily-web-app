@@ -10,6 +10,7 @@ import authReducer, {
   Logout,
   getSessionEpic,
   loginEpic,
+  registerEpic,
   logoutEpic,
 } from './auth/duck';
 
@@ -34,4 +35,4 @@ export const rootReducer = (state: RootState, action: Action) => {
   return appReducer(state, action);
 };
 
-export const rootEpic = combineEpics(getSessionEpic, loginEpic, logoutEpic);
+export const rootEpic = combineEpics(getSessionEpic, loginEpic, registerEpic, logoutEpic);

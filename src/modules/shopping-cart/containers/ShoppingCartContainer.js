@@ -1,0 +1,21 @@
+// @flow
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+// import {actions as ShoppingCartActions} from '../duck';
+import ShoppingCart from '../components/ShoppingCart';
+
+import type {Dispatch} from 'redux';
+
+import type {RootState} from '../../index';
+
+export default connect(
+  (state: RootState) => ({
+
+  }), (dispatch: Dispatch<any>) =>
+    bindActionCreators(
+      {
+        // ...ShoppingCartActions,
+      },
+      dispatch,
+    ),
+  )(ShoppingCart);

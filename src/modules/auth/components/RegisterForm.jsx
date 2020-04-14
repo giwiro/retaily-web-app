@@ -11,29 +11,45 @@ import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
+import {useForm} from 'react-hook-form';
 import Copyright from '../../../elements/Copyright/Copyright';
 
 import {useStyles} from './CommonFormStyle';
 
 type Props = {|
-  handleClickShowLogin: (e: Event) => void;
+  handleClickShowLogin: (e: Event) => void,
+  register: ({ firstName: string, lastName: string, email: string, password: string }) => void,
+  registerError?: string,
 |};
 
 export default function RegisterForm(props: Props) {
   const classes = useStyles();
-  const {handleClickShowLogin} = props;
+  const {handleClickShowLogin, registerError} = props;
+  const {handleSubmit, register, errors} = useForm();
+
+  const onSubmit = (values) => {
+    console.log('values', values);
+    props.register({
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      password: values.password,
+    });
+  };
 
   return (
     <Container component="main" maxWidth="xs">
-      <CssBaseline />
+      <CssBaseline/>
       <div className={classes.paper}>
-        <Avatar className={classes.avatar}><LockOutlinedIcon /></Avatar>
+        <Avatar className={classes.avatar}><LockOutlinedIcon/></Avatar>
         <Typography component="h1" variant="h5">Register</Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form}
+              onSubmit={handleSubmit(onSubmit)}
+              noValidate>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
-                autoComplete="fname"
+                autoComplete="firstName"
                 name="firstName"
                 variant="outlined"
                 required
@@ -41,17 +57,23 @@ export default function RegisterForm(props: Props) {
                 id="firstName"
                 label="First Name"
                 autoFocus
+                error={!!errors.firstName}
+                helperText={errors.firstName ? errors.firstName.message : ''}
+                inputRef={register({required: 'Required'})}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
+                autoComplete="lastName"
+                name="lastName"
                 variant="outlined"
                 required
                 fullWidth
                 id="lastName"
                 label="Last Name"
-                name="lastName"
-                autoComplete="lname"
+                error={!!errors.lastName}
+                helperText={errors.lastName ? errors.lastName.message : ''}
+                inputRef={register({required: 'Required'})}
               />
             </Grid>
             <Grid item xs={12}>
@@ -63,6 +85,15 @@ export default function RegisterForm(props: Props) {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
+                error={!!errors.email}
+                helperText={errors.email ? errors.email.message : ''}
+                inputRef={register({
+                  required: 'Required',
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                    message: 'Invalid email address',
+                  },
+                })}
               />
             </Grid>
             <Grid item xs={12}>
@@ -75,14 +106,22 @@ export default function RegisterForm(props: Props) {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                error={!!errors.password}
+                helperText={errors.password ? errors.password.message : ''}
+                inputRef={register({required: 'Required'})}
               />
             </Grid>
           </Grid>
+          {registerError && <Typography component="p"
+                                        variant="body1"
+                                        className={classes.errorText}
+                                        color="error">{registerError}</Typography>}
           <Button
             type="submit"
             fullWidth
             variant="contained"
             color="primary"
+            size="large"
             className={classes.submit}
           >
             Register
@@ -97,7 +136,7 @@ export default function RegisterForm(props: Props) {
             </Grid>
           </Grid>
           <Box mt={5}>
-            <Copyright />
+            <Copyright/>
           </Box>
         </form>
       </div>
@@ -107,4 +146,6 @@ export default function RegisterForm(props: Props) {
 
 RegisterForm.propTypes = {
   handleClickShowLogin: PropTypes.func.isRequired,
+  register: PropTypes.func.isRequired,
+  registerError: PropTypes.string,
 };

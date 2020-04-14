@@ -10,15 +10,18 @@ import './index.css';
 
 const store = configureStore();
 
+const app = (
+  <Router>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </Router>
+);
+
 ReactDOM.render(
-  <React.StrictMode>
-    <Router>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </Router>
-  </React.StrictMode>,
-  document.getElementById('root')
+  // <StrictMode>{app}</StrictMode>,
+  app,
+  document.getElementById('root'),
 );
 
 // If you want your app to work offline and load faster, you can change

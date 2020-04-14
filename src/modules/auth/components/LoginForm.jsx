@@ -19,12 +19,13 @@ import {useStyles} from './CommonFormStyle';
 type Props = {|
   handleClickShowRegister: (e: Event) => void,
   login: ({email: string, password: string}) => void,
+  loginError?: string,
 |};
 
 export default function LoginForm(props: Props) {
   const classes = useStyles();
-  const {handleClickShowRegister} = props;
-  const { handleSubmit, register, errors } = useForm();
+  const {handleClickShowRegister, loginError} = props;
+  const {handleSubmit, register, errors} = useForm();
 
   const onSubmit = (values) => {
     const {login} = props;
@@ -77,11 +78,16 @@ export default function LoginForm(props: Props) {
             helperText={errors.password ? errors.password.message : ''}
             inputRef={register({required: 'Required'})}
           />
+          {loginError && <Typography component="p"
+                                     variant="body1"
+                                     className={classes.errorText}
+                                     color="error">{loginError}</Typography>}
           <Button
             type="submit"
             fullWidth
             variant="contained"
             color="primary"
+            size="large"
             className={classes.submit}
           >
             Sign In
@@ -108,4 +114,5 @@ export default function LoginForm(props: Props) {
 LoginForm.propTypes = {
   handleClickShowRegister: PropTypes.func.isRequired,
   login: PropTypes.func.isRequired,
+  loginError: PropTypes.string,
 };

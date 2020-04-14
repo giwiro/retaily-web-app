@@ -12,7 +12,6 @@ import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import {makeStyles} from '@material-ui/core/styles';
 
 import logo from '../../../assets/img/logo.png';
-import {MenuItemLink} from '../../../elements/MenuItemLink/MenuItemLink';
 
 import type {User} from '../../../entities';
 
@@ -94,7 +93,7 @@ export default function Navbar(props: Props, state: State) {
                       onClick={handleClickAuthMenu}>
             <AccountCircleIcon/>
           </IconButton>
-          <Menu
+          {anchorEl && <Menu
             id="user-menu"
             anchorEl={anchorEl}
             keepMounted
@@ -105,13 +104,13 @@ export default function Navbar(props: Props, state: State) {
               <MenuItem key="login" onClick={handleClickLogin}>Login</MenuItem>,
             ]}
             {user && [
-              <MenuItemLink key="my-orders"
-                            to="/my-orders"
-                            onClick={handleCloseAuthMenu}>My orders</MenuItemLink>,
-              /*<MenuItem key="my-orders">My orders</MenuItem>,*/
+              <MenuItem key="my-orders"
+                        to="/my-orders"
+                        component={Link}
+                        onClick={handleCloseAuthMenu}>My orders</MenuItem>,
               <MenuItem key="logout" onClick={handleClickLogout}>Logout</MenuItem>,
             ]}
-          </Menu>
+          </Menu>}
         </Toolbar>
       </AppBar>
     </>

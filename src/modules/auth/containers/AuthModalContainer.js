@@ -11,6 +11,8 @@ export default connect(
   (state: RootState) => ({
     isAuthenticating: state.auth.isAuthenticating,
     user: state.auth.user,
+    loginError: state.auth.loginError,
+    registerError: state.auth.registerError,
   }), (dispatch: Dispatch<any>) =>
     bindActionCreators(
       {

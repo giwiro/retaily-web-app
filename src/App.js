@@ -2,12 +2,14 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Redirect} from 'react-router-dom'
+import {Redirect, Route, Switch} from 'react-router-dom';
 import {usePrevious} from './utils';
 import {createMuiTheme} from '@material-ui/core';
 import {ThemeProvider} from '@material-ui/styles';
+import Home from './modules/home/components/Home';
 import AuthModalContainer from './modules/auth/containers/AuthModalContainer';
 import NavbarContainer from './modules/navbar/containers/NavbarContainer';
+import ShoppingCartContainer from './modules/shopping-cart/containers/ShoppingCartContainer';
 
 import type {User} from './entities';
 import type {RootState} from './modules';
@@ -17,6 +19,9 @@ import blue from '@material-ui/core/colors/blue';
 const theme = createMuiTheme({
   palette: {
     primary: blue,
+  },
+  typography: {
+    fontFamily: '"Montserrat", sans-serif',
   },
 });
 
@@ -34,27 +39,24 @@ function App(props: Props, state: State) {
 
   const prevUser = usePrevious(user);
 
-  if (!prevUser && user && authModalOpen) {
-    setAuthModalOpen(false);
-  }
-
-  if (prevUser && !user) {
-    return <Redirect to="/"/>;
-  }
-
   return (
     <ThemeProvider theme={theme}>
-        <NavbarContainer authModalOpen={authModalOpen}
-                         setAuthModalOpen={setAuthModalOpen}/>
-        <AuthModalContainer open={authModalOpen}
-                            handleClose={() => setAuthModalOpen(false)}/>
+      {/* If user just become undefined */}
+      {prevUser && !user && <Redirect to="/"/>}
+      <NavbarContainer authModalOpen={authModalOpen}
+                       setAuthModalOpen={setAuthModalOpen}/>
+      <AuthModalContainer open={authModalOpen}
+                          setAuthModalOpen={setAuthModalOpen}/>
+      <Switch>
+        <Route path="/" exact><Home/></Route>
+        <Route path="/shopping-cart" exact><ShoppingCartContainer/></Route>
+      </Switch>
     </ThemeProvider>
   );
 }
 
 App.propTypes = {
   user: PropTypes.object,
-  history: PropTypes.object.isRequired,
 };
 
 export default connect(
