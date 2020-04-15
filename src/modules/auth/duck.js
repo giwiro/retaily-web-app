@@ -21,6 +21,7 @@ export type AuthState = {
   isAuthenticating?: boolean,
   loginError?: string,
   registerError?: string,
+  initialAuthDone?: boolean,
 };
 
 export class GetSession extends ActionCreator<AuthAction> {}
@@ -53,7 +54,8 @@ export const initialState = {};
 
 export default createReducer(initialState, {
   [GetSession.type]: () => ({isAuthenticating: true}),
-  [GetSessionSuccess.type]: (_, action: AuthAction) => ({user: action.user}),
+  [GetSessionSuccess.type]: (_, action: AuthAction) =>
+    ({user: action.user, initialAuthDone: true}),
   [Login.type]: () => ({isAuthenticating: true}),
   [LoginSuccess.type]: (_, action: AuthAction) => ({user: action.user}),
   [LoginErrorFn.type]: (_, action: AuthAction) => ({loginError: action.error}),
@@ -70,7 +72,7 @@ export const getSessionEpic = (action$: ActionsObservable) =>
     ofType(GetSession.type),
     switchMap(() =>
       getSessionApi().pipe(
-        map((user: User) => new LoginSuccess({user})),
+        map((user: User) => new GetSessionSuccess({user})),
         catchError(() => of(new AuthResetState())),
       ),
     ),

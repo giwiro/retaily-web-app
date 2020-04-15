@@ -10,7 +10,8 @@ import type {RootState} from '../../index';
 
 export default connect(
   (state: RootState) => ({
-
+    shoppingCart: state.shoppingCart.shoppingCart,
+    isFetching: state.shoppingCart.isFetching,
   }), (dispatch: Dispatch<any>) =>
     bindActionCreators(
       {

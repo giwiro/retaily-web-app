@@ -4,23 +4,17 @@ import PropTypes from 'prop-types';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {makeStyles} from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
-import {usePrevious} from '../../../utils';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 
-import type {User} from '../../../entities';
-
 type Props = {|
   open: boolean,
-  setAuthModalOpen: (open: boolean) => void,
-  user?: User,
-  // handleClose: () => void,
+  handleClose: () => void,
   login: ({ email: string, password: string }) => void,
   register: ({ firstName: string, lastName: string, email: string, password: string }) => void,
   isAuthenticating?: boolean,
   loginError?: string,
   registerError?: string,
-  authResetState: () => void,
 |};
 
 type State = {|
@@ -58,19 +52,15 @@ const useStyles = makeStyles((theme) => ({
 export default function AuthModal(props: Props, state: State) {
   const {
     open,
-    user,
-    // handleClose,
+    handleClose,
     login,
     isAuthenticating,
     loginError,
     register,
     registerError,
-    setAuthModalOpen,
-    authResetState,
   } = props;
   const [showLogin, setShowLogin] = useState(true);
   const classes = useStyles();
-  const prevUser = usePrevious(user);
 
   const handleClickShowRegister = (e: Event) => {
     e.preventDefault();
@@ -82,21 +72,9 @@ export default function AuthModal(props: Props, state: State) {
     setShowLogin(true);
   };
 
-  const handleClose = () => {
-    if (!isAuthenticating) {
-      authResetState();
-      setAuthModalOpen(false);
-    }
-  };
-
-  if (!prevUser && user && open) {
-    // setAuthModalOpen(false);
-    handleClose();
-  }
-
   return (
     <Modal
-      open={open || !!isAuthenticating}
+      open={open || (open && !!isAuthenticating)}
       onClose={handleClose}
       className={classes.modal}
     >
@@ -121,13 +99,10 @@ export default function AuthModal(props: Props, state: State) {
 
 AuthModal.propTypes = {
   open: PropTypes.bool.isRequired,
-  setAuthModalOpen: PropTypes.func.isRequired,
-  user: PropTypes.object,
-  // handleClose: PropTypes.func.isRequired,
+  handleClose: PropTypes.func.isRequired,
   login: PropTypes.func.isRequired,
   register: PropTypes.func.isRequired,
   isAuthenticating: PropTypes.bool,
   loginError: PropTypes.string,
   registerError: PropTypes.string,
-  authResetState: PropTypes.func.isRequired,
 };

@@ -4,9 +4,10 @@ import {combineEpics} from 'redux-observable';
 
 import type {Action} from '../store/utils';
 import type {AuthState} from './auth/duck';
+import type {ShoppingCartState} from './shopping-cart/duck';
 
 import authReducer, {
-  initialState,
+  initialState as AuthInitialState,
   Logout,
   getSessionEpic,
   loginEpic,
@@ -14,17 +15,35 @@ import authReducer, {
   logoutEpic,
 } from './auth/duck';
 
+import shoppingCartReducer, {
+  initialState as ShoppingCartInitialState,
+  fetchShoppingCartEpic,
+} from './shopping-cart/duck';
+
 export type RootState = {
   auth: AuthState,
+  shoppingCart: ShoppingCartState,
 };
 
 export const defaultInitialState = {
-  auth: initialState,
+  auth: AuthInitialState,
+  shoppingCart: ShoppingCartInitialState,
 };
 
 export const appReducer = combineReducers({
   auth: authReducer,
+  shoppingCart: shoppingCartReducer,
 });
+
+export const rootEpic = combineEpics(
+  // auth
+  getSessionEpic,
+  loginEpic,
+  registerEpic,
+  logoutEpic,
+  // shopping-cart
+  fetchShoppingCartEpic,
+);
 
 export const rootReducer = (state: RootState, action: Action) => {
   // Clear higher order state when logout
@@ -34,5 +53,3 @@ export const rootReducer = (state: RootState, action: Action) => {
   }
   return appReducer(state, action);
 };
-
-export const rootEpic = combineEpics(getSessionEpic, loginEpic, registerEpic, logoutEpic);

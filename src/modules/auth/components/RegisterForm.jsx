@@ -28,7 +28,6 @@ export default function RegisterForm(props: Props) {
   const {handleSubmit, register, errors} = useForm();
 
   const onSubmit = (values) => {
-    console.log('values', values);
     props.register({
       firstName: values.firstName,
       lastName: values.lastName,
