@@ -42,14 +42,14 @@ export const rootEpic = combineEpics(
   registerEpic,
   logoutEpic,
   // shopping-cart
-  fetchShoppingCartEpic,
+  fetchShoppingCartEpic
 );
 
 export const rootReducer = (state: RootState, action: Action) => {
   // Clear higher order state when logout
   if (action.type === Logout.type) {
     // But keep localValue (these are agnostic)
-    state = { ...defaultInitialState };
+    state = {...defaultInitialState};
   }
   return appReducer(state, action);
 };

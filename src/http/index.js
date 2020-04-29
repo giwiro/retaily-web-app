@@ -17,7 +17,7 @@ type RequestMethod = 'GET' | 'POST';
 function httpCreatorFactory(
   method: RequestMethod,
   route: string,
-  o?: RequestOptions,
+  o?: RequestOptions
 ): Observable<any> {
   let url = route;
   let queryParams = {};
@@ -53,19 +53,18 @@ function httpCreatorFactory(
         method,
         headers,
         body,
-      }).pipe(
-        map((ajaxResponse) => ajaxResponse.response),
-      );
+      }).pipe(map(ajaxResponse => ajaxResponse.response));
     default:
       console.error(new Error('HTTP Method not supported'));
   }
-
 }
 
-export const getCreator = (route: string) =>
-  (queryParams: {[key: string]: string}, o?: RequestOptions) =>
-    httpCreatorFactory('GET', route, {queryParams, ...o});
+export const getCreator = (route: string) => (
+  queryParams: {[key: string]: string},
+  o?: RequestOptions
+) => httpCreatorFactory('GET', route, {queryParams, ...o});
 
-export const postCreator = (route: string) =>
-  (body: {[key: string]: any}, o?: RequestOptions) =>
-    httpCreatorFactory('POST', route, {body, ...o});
+export const postCreator = (route: string) => (
+  body: {[key: string]: any},
+  o?: RequestOptions
+) => httpCreatorFactory('POST', route, {body, ...o});

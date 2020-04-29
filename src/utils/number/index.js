@@ -12,7 +12,9 @@ export const commaFormat = (price: number | string): string => {
     p = price;
   }
 
-  let parts = '', partInteger = p, partDecimal = '';
+  let parts = '',
+    partInteger = p,
+    partDecimal = '';
   if (p.indexOf(DECIMAL_MARK) >= 0) {
     parts = p.split(DECIMAL_MARK);
     partInteger = parts[0];

@@ -1,4 +1,4 @@
-import { getCreator } from '../../http';
+import {getCreator} from '../../http';
 
 export const endpoints = Object.freeze({
   GET_SHOPPING_CART: `${process.env.REACT_APP_ENDPOINT}/supermarket/shopping-cart/`,

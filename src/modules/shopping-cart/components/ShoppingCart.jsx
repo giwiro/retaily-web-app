@@ -1,7 +1,13 @@
 // @flow
 import React from 'react';
 import PropTypes from 'prop-types';
+import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import CreditCardIcon from '@material-ui/icons/CreditCard';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import {Link} from 'react-router-dom';
 import Table from '@material-ui/core/Table';
+import IconButton from '@material-ui/core/IconButton';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
@@ -23,13 +29,16 @@ type Props = {
 
 export const useStyles = makeStyles((theme) => ({
   shoppingCartWrap: {
-    marginTop: -theme.spacing(8),
+    marginTop: -theme.spacing(12),
   },
   cardContent: {
-    minHeight: '250px',
+    minHeight: '450px',
   },
   rowImage: {
-    height: '150px',
+    height: '100px',
+  },
+  loading: {
+    marginTop: theme.spacing(21),
   },
 }));
 
@@ -50,6 +59,9 @@ export default function ShoppingCart(props: Props) {
         <TableCell align="right">$ {commaFormat(item.product.price)}</TableCell>
         <TableCell align="right">{item.amount}</TableCell>
         <TableCell align="right">$ {commaFormat(subtotal)}</TableCell>
+        <TableCell align="right">
+          <IconButton color="secondary"><DeleteForeverIcon/></IconButton>
+        </TableCell>
       </TableRow>
     );
   });
@@ -71,18 +83,47 @@ export default function ShoppingCart(props: Props) {
               <Table className={classes.table}>
                 <TableHead>
                   <TableRow>
-                    <TableCell></TableCell>
+                    <TableCell/>
                     <TableCell align="right">Product</TableCell>
                     <TableCell align="right">Price</TableCell>
                     <TableCell align="right">QTY</TableCell>
                     <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right"></TableCell>
+                    <TableCell align="right"/>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows}
+                  {!isFetching && rows}
+
+                  <TableRow>
+                    <TableCell colSpan={2}/>
+                    <TableCell align="right">Total</TableCell>
+                    <TableCell align="right">$ 300.00</TableCell>
+                    <TableCell align="right"
+                               colSpan={2}>
+                      <Button
+                        type="button"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        className={classes.submit}
+                        startIcon={<CreditCardIcon/>}
+                        component={Link}
+                        to="/shopping-cart/checkout"
+                      >
+                        Checkout
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
+
+              {isFetching &&
+              <Grid container
+                    alignItems="center"
+                    justify="center">
+                <CircularProgress className={classes.loading}/>
+              </Grid>}
             </CardContent>
           </Card>
         </Container>
@@ -93,6 +134,6 @@ export default function ShoppingCart(props: Props) {
 }
 
 ShoppingCart.propTypes = {
-  shoppingCart: PropTypes.object.isRequired,
+  shoppingCart: PropTypes.object,
   isFetching: PropTypes.bool,
 };

@@ -12,11 +12,12 @@ export default connect(
   (state: RootState) => ({
     shoppingCart: state.shoppingCart.shoppingCart,
     isFetching: state.shoppingCart.isFetching,
-  }), (dispatch: Dispatch<any>) =>
+  }),
+  (dispatch: Dispatch<any>) =>
     bindActionCreators(
       {
         // ...ShoppingCartActions,
       },
-      dispatch,
-    ),
-  )(ShoppingCart);
+      dispatch
+    )
+)(ShoppingCart);

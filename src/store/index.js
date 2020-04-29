@@ -14,17 +14,12 @@ const configureStore = (initialState: RootState = defaultInitialState) => {
   let store;
 
   if (process.env.NODE_ENV === 'development' && window) {
-    const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-    const enhancer = composeEnhancers(
-      appliedMiddlewares,
-    );
+    const composeEnhancers =
+      window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+    const enhancer = composeEnhancers(appliedMiddlewares);
     store = createStore<*, *, *>(rootReducer, initialState, enhancer);
-  }else {
-    store = createStore<*, *, *>(
-      rootReducer,
-      initialState,
-      appliedMiddlewares,
-    );
+  } else {
+    store = createStore<*, *, *>(rootReducer, initialState, appliedMiddlewares);
   }
   epic.run(rootEpic);
   return store;

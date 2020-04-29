@@ -12,11 +12,12 @@ export default connect(
     isAuthenticating: state.auth.isAuthenticating,
     loginError: state.auth.loginError,
     registerError: state.auth.registerError,
-  }), (dispatch: Dispatch<any>) =>
+  }),
+  (dispatch: Dispatch<any>) =>
     bindActionCreators(
       {
         ...AuthActions,
       },
-      dispatch,
-    ),
+      dispatch
+    )
 )(AuthModal);

@@ -2,7 +2,11 @@
 import {ofType} from 'redux-observable';
 import {AjaxError, of} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
-import {ActionCreator, createReducer, generateActionCreators} from '../../store/utils';
+import {
+  ActionCreator,
+  createReducer,
+  generateActionCreators,
+} from '../../store/utils';
 import {getSessionApi, loginApi, logoutApi, registerApi} from './api';
 
 import type {User} from '../../entities';
@@ -26,6 +30,7 @@ export type AuthState = {
 
 export class GetSession extends ActionCreator<AuthAction> {}
 export class GetSessionSuccess extends ActionCreator<AuthAction> {}
+export class GetSessionErrorFn extends ActionCreator<AuthAction> {}
 export class Login extends ActionCreator<AuthAction> {}
 export class LoginSuccess extends ActionCreator<AuthAction> {}
 export class LoginErrorFn extends ActionCreator<AuthAction> {}
@@ -39,6 +44,7 @@ export class AuthNoop extends ActionCreator<AuthAction> {}
 export const actions = generateActionCreators([
   GetSession,
   GetSessionSuccess,
+  GetSessionErrorFn,
   Login,
   LoginSuccess,
   LoginErrorFn,
@@ -54,15 +60,34 @@ export const initialState = {};
 
 export default createReducer(initialState, {
   [GetSession.type]: () => ({isAuthenticating: true}),
-  [GetSessionSuccess.type]: (_, action: AuthAction) =>
-    ({user: action.user, initialAuthDone: true}),
-  [Login.type]: () => ({isAuthenticating: true}),
-  [LoginSuccess.type]: (_, action: AuthAction) => ({user: action.user}),
-  [LoginErrorFn.type]: (_, action: AuthAction) => ({loginError: action.error}),
-  [Register.type]: () => ({isAuthenticating: true}),
-  [RegisterSuccess.type]: (_, action: AuthAction) => ({user: action.user}),
-  [RegisterErrorFn.type]: (_, action: AuthAction) => ({registerError: action.error}),
-  [Logout.type]: () => initialState,
+  [GetSessionSuccess.type]: (_, action: AuthAction) => ({
+    user: action.user,
+    initialAuthDone: true,
+  }),
+  [GetSessionErrorFn.type]: () => ({initialAuthDone: true}),
+  [Login.type]: (state: AuthState) => ({...state, isAuthenticating: true}),
+  [LoginSuccess.type]: (state: AuthState, action: AuthAction) => ({
+    ...state,
+    user: action.user,
+    isAuthenticating: false,
+  }),
+  [LoginErrorFn.type]: (state: AuthState, action: AuthAction) => ({
+    ...state,
+    loginError: action.error,
+    isAuthenticating: false,
+  }),
+  [Register.type]: (state: AuthState) => ({...state, isAuthenticating: true}),
+  [RegisterSuccess.type]: (state: AuthState, action: AuthAction) => ({
+    ...state,
+    user: action.user,
+    isAuthenticating: false,
+  }),
+  [RegisterErrorFn.type]: (state: AuthState, action: AuthAction) => ({
+    ...state,
+    registerError: action.error,
+    isAuthenticating: false,
+  }),
+  [Logout.type]: () => ({...initialState, initialAuthDone: true}),
   [AuthResetState.type]: () => initialState,
   [AuthNoop.type]: (state: AuthState) => state,
 });
@@ -73,9 +98,9 @@ export const getSessionEpic = (action$: ActionsObservable) =>
     switchMap(() =>
       getSessionApi().pipe(
         map((user: User) => new GetSessionSuccess({user})),
-        catchError(() => of(new AuthResetState())),
-      ),
-    ),
+        catchError(() => of(new GetSessionErrorFn()))
+      )
+    )
   );
 
 export const loginEpic = (action$: ActionsObservable) =>
@@ -88,10 +113,10 @@ export const loginEpic = (action$: ActionsObservable) =>
       }).pipe(
         map((user: User) => new LoginSuccess({user})),
         catchError((error: AjaxError) =>
-          of(new LoginErrorFn({error: error.response.message})),
-        ),
-      ),
-    ),
+          of(new LoginErrorFn({error: error.response.message}))
+        )
+      )
+    )
   );
 
 export const registerEpic = (action$: ActionsObservable) =>
@@ -106,10 +131,10 @@ export const registerEpic = (action$: ActionsObservable) =>
       }).pipe(
         map((user: User) => new RegisterSuccess({user})),
         catchError((error: AjaxError) =>
-          of(new RegisterErrorFn({error: error.response.message})),
-        ),
-      ),
-    ),
+          of(new RegisterErrorFn({error: error.response.message}))
+        )
+      )
+    )
   );
 
 export const logoutEpic = (action$: ActionsObservable) =>
@@ -118,7 +143,7 @@ export const logoutEpic = (action$: ActionsObservable) =>
     switchMap(() =>
       logoutApi().pipe(
         map(() => new AuthNoop()),
-        catchError(() => of(new AuthNoop())),
-      ),
-    ),
+        catchError(() => of(new AuthNoop()))
+      )
+    )
   );

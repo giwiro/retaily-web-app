@@ -5,7 +5,8 @@ import PropTypes from 'prop-types';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import {makeStyles} from '@material-ui/core/styles';
-import {Location} from 'react-router-dom';
+
+import type {Location} from 'react-router-dom';
 
 import background from '../../../assets/img/background.png';
 
@@ -15,9 +16,10 @@ type Props = {
   setAuthModalOpen: (open: boolean) => void,
   location: Location,
   user?: User,
+  initialAuthDone: boolean,
 };
 
-export const useStyles = makeStyles((theme) => ({
+export const useStyles = makeStyles(theme => ({
   topWrap: {
     height: '90vh',
     maxHeight: '1080px',
@@ -37,25 +39,22 @@ export const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Home(props: Props) {
-  const {location, setAuthModalOpen, user} = props;
+  const {location, setAuthModalOpen, user, initialAuthDone} = props;
   const classes = useStyles();
 
   useEffect(() => {
     const parsed = queryString.parse(location.search);
-    if (parsed['login-modal'] && !user) {
+    if (parsed['login-modal'] && !user && initialAuthDone) {
       setAuthModalOpen(true);
     }
-  }, [location, user, setAuthModalOpen]);
+  }, [location, user, setAuthModalOpen, initialAuthDone]);
 
   return (
     <Grid container>
-      <Grid container
-            xs={12}
-            item
-            className={classes.topWrap}>
-        <Typography component="h1"
-                    variant="h4"
-                    className={classes.title}>Buy what the f**k you want !</Typography>
+      <Grid container xs={12} item className={classes.topWrap}>
+        <Typography component="h1" variant="h4" className={classes.title}>
+          Buy what the f**k you want !
+        </Typography>
       </Grid>
     </Grid>
   );
@@ -65,4 +64,5 @@ Home.propTypes = {
   setAuthModalOpen: PropTypes.func.isRequired,
   location: PropTypes.object.isRequired,
   user: PropTypes.object,
+  initialAuthDone: PropTypes.bool,
 };

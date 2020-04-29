@@ -1,4 +1,5 @@
 // @flow
+import Badge from '@material-ui/core/Badge';
 import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
@@ -13,7 +14,7 @@ import {makeStyles} from '@material-ui/core/styles';
 
 import logo from '../../../assets/img/logo.png';
 
-import type {User} from '../../../entities';
+import type {ShoppingCart, User} from '../../../entities';
 
 const useStyles = makeStyles({
   logo: {
@@ -35,6 +36,7 @@ type Props = {|
   setAuthModalOpen: (open: boolean) => void,
   getSession: () => void,
   logout: () => void,
+  shoppingCart?: ShoppingCart,
 |};
 
 type State = {|
@@ -42,7 +44,7 @@ type State = {|
 |};
 
 export default function Navbar(props: Props, state: State) {
-  const {setAuthModalOpen, logout, getSession, user} = props;
+  const {setAuthModalOpen, logout, getSession, user, shoppingCart} = props;
   const [anchorEl, setAnchorEl] = useState(null);
   const classes = useStyles();
 
@@ -84,10 +86,13 @@ export default function Navbar(props: Props, state: State) {
           <div className={classes.grow}/>
           <Link to="/shopping-cart"
                 className={classes.iconLink}>
-            <IconButton color="inherit"
-                        onClick={handleClickShoppingCart}>
-              <ShoppingCartIcon/>
-            </IconButton>
+              <IconButton color="inherit"
+                          onClick={handleClickShoppingCart}>
+                <Badge badgeContent={shoppingCart ? shoppingCart.items.length : 0}
+                       color="secondary">
+                  <ShoppingCartIcon/>
+                </Badge>
+              </IconButton>
           </Link>
           <IconButton color="inherit"
                       onClick={handleClickAuthMenu}>
@@ -123,4 +128,5 @@ Navbar.propTypes = {
   setAuthModalOpen: PropTypes.func.isRequired,
   getSession: PropTypes.func.isRequired,
   logout: PropTypes.func.isRequired,
+  shoppingCart: PropTypes.object,
 };

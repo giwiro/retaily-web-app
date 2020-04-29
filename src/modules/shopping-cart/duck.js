@@ -2,7 +2,11 @@
 import {ofType} from 'redux-observable';
 import {AjaxError, of} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
-import {ActionCreator, createReducer, generateActionCreators} from '../../store/utils';
+import {
+  ActionCreator,
+  createReducer,
+  generateActionCreators,
+} from '../../store/utils';
 import {GetSessionSuccess, LoginSuccess} from '../auth/duck';
 import {getShoppingCartApi} from './api';
 
@@ -35,10 +39,12 @@ export const initialState = {};
 
 export default createReducer(initialState, {
   [FetchShoppingCart.type]: () => ({isFetching: true}),
-  [FetchShoppingCartSuccess.type]: (_, action: ShoppingCartAction) =>
-    ({shoppingCart: action.shoppingCart}),
-  [FetchShoppingCartErrorFn.type]: (_, action: ShoppingCartAction) =>
-    ({fetchShoppingCartError: action.error}),
+  [FetchShoppingCartSuccess.type]: (_, action: ShoppingCartAction) => ({
+    shoppingCart: action.shoppingCart,
+  }),
+  [FetchShoppingCartErrorFn.type]: (_, action: ShoppingCartAction) => ({
+    fetchShoppingCartError: action.error,
+  }),
 });
 
 export const fetchShoppingCartEpic = (action$: ActionsObservable) =>
@@ -46,10 +52,13 @@ export const fetchShoppingCartEpic = (action$: ActionsObservable) =>
     ofType(FetchShoppingCart.type, LoginSuccess.type, GetSessionSuccess.type),
     switchMap((action: ShoppingCartAction) =>
       getShoppingCartApi().pipe(
-        map((shoppingCart: ShoppingCart) => new FetchShoppingCartSuccess({shoppingCart})),
-        catchError((error: AjaxError) =>
-          of(new FetchShoppingCartErrorFn({error: error.response.message})),
+        map(
+          (shoppingCart: ShoppingCart) =>
+            new FetchShoppingCartSuccess({shoppingCart})
         ),
-      ),
-    ),
+        catchError((error: AjaxError) =>
+          of(new FetchShoppingCartErrorFn({error: error.response.message}))
+        )
+      )
+    )
   );

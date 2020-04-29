@@ -63,17 +63,22 @@ function App(props: Props, state: State) {
   return (
     <ThemeProvider theme={theme}>
       {/* If user just become undefined */}
-      {prevUser && !user && <Redirect to="/"/>}
-      <NavbarContainer authModalOpen={authModalOpen}
-                       setAuthModalOpen={setAuthModalOpen}/>
-      <AuthModalContainer open={authModalOpen}
-                          handleClose={handleClose}/>
+      {prevUser && !user && <Redirect to="/" />}
+      <NavbarContainer
+        authModalOpen={authModalOpen}
+        setAuthModalOpen={setAuthModalOpen}
+      />
+      <AuthModalContainer open={authModalOpen} handleClose={handleClose} />
       <Switch>
-        <Route path="/" exact><HomeContainer setAuthModalOpen={setAuthModalOpen}/></Route>
-        <PrivateRoute exact
-                      component={ShoppingCartContainer}
-                      user={user}
-                      initialAuthDone={initialAuthDone}/>
+        <Route path="/" exact>
+          <HomeContainer setAuthModalOpen={setAuthModalOpen} />
+        </Route>
+        <PrivateRoute
+          exact
+          component={ShoppingCartContainer}
+          user={user}
+          initialAuthDone={initialAuthDone}
+        />
       </Switch>
     </ThemeProvider>
   );
@@ -91,11 +96,12 @@ export default connect(
     user: state.auth.user,
     initialAuthDone: state.auth.initialAuthDone,
     isAuthenticating: state.auth.isAuthenticating,
-  }), (dispatch: Dispatch<any>) =>
+  }),
+  (dispatch: Dispatch<any>) =>
     bindActionCreators(
       {
         ...AuthActions,
       },
-      dispatch,
-    ),
+      dispatch
+    )
 )(App);

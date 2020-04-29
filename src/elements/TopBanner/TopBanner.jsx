@@ -8,8 +8,8 @@ import background from '../../assets/img/background.png';
 
 export const useStyles = makeStyles((theme) => ({
   topWrap: {
-    minHeight: '250px',
-    maxHeight: '350px',
+    minHeight: '300px',
+    // maxHeight: '350px',
     textAlign: 'center',
     alignItems: 'center',
     justifyContent: 'center',
@@ -22,7 +22,7 @@ export const useStyles = makeStyles((theme) => ({
     fontWeight: 700,
     textTransform: 'uppercase',
     color: '#555',
-    marginBottom: theme.spacing(8),
+    marginBottom: theme.spacing(11),
   },
 }));
 

@@ -1,4 +1,4 @@
-import { getCreator, postCreator } from '../../http';
+import {getCreator, postCreator} from '../../http';
 
 export const endpoints = Object.freeze({
   GET_SESSION: `${process.env.REACT_APP_ENDPOINT}/bouncer/auth/session`,

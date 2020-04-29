@@ -12,11 +12,13 @@ export default connect(
   (state: RootState) => ({
     isAuthenticating: state.auth.isAuthenticating,
     user: state.auth.user,
-  }), (dispatch: Dispatch<any>) =>
+    shoppingCart: state.shoppingCart.shoppingCart,
+  }),
+  (dispatch: Dispatch<any>) =>
     bindActionCreators(
       {
         ...AuthActions,
       },
-      dispatch,
-    ),
-  )(Navbar);
+      dispatch
+    )
+)(Navbar);
