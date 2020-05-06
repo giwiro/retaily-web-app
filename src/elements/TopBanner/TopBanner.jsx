@@ -6,7 +6,7 @@ import {makeStyles} from '@material-ui/core/styles';
 
 import background from '../../assets/img/background.png';
 
-export const useStyles = makeStyles((theme) => ({
+export const useStyles = makeStyles(theme => ({
   topWrap: {
     minHeight: '300px',
     // maxHeight: '350px',
@@ -30,13 +30,10 @@ export default function TopBanner() {
   const classes = useStyles();
 
   return (
-    <Grid container
-          xs={12}
-          item
-          className={classes.topWrap}>
-      <Typography component="h1"
-                  variant="h4"
-                  className={classes.title}>Shopping Cart</Typography>
+    <Grid container xs={12} item className={classes.topWrap}>
+      <Typography component="h1" variant="h4" className={classes.title}>
+        Shopping Cart
+      </Typography>
     </Grid>
   );
 }

@@ -57,7 +57,11 @@ export const fetchShoppingCartEpic = (action$: ActionsObservable) =>
             new FetchShoppingCartSuccess({shoppingCart})
         ),
         catchError((error: AjaxError) =>
-          of(new FetchShoppingCartErrorFn({error: error.response.message}))
+          of(
+            new FetchShoppingCartErrorFn({
+              error: error.response ? error.response.message : '',
+            })
+          )
         )
       )
     )

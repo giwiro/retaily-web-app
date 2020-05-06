@@ -20,14 +20,17 @@ import {makeStyles} from '@material-ui/core/styles';
 import TopBanner from '../../../elements/TopBanner/TopBanner';
 import {commaFormat} from '../../../utils/number';
 
-import type {ShoppingCart as ShoppingCartEntity, ShoppingCartItem} from '../../../entities';
+import type {
+  ShoppingCart as ShoppingCartEntity,
+  ShoppingCartItem,
+} from '../../../entities';
 
 type Props = {
   shoppingCart?: ShoppingCartEntity,
   isFetching?: boolean,
 };
 
-export const useStyles = makeStyles((theme) => ({
+export const useStyles = makeStyles(theme => ({
   shoppingCartWrap: {
     marginTop: -theme.spacing(12),
   },
@@ -46,60 +49,67 @@ export default function ShoppingCart(props: Props) {
   const {shoppingCart, isFetching} = props;
   const classes = useStyles();
 
-  const rows = shoppingCart && shoppingCart.items.map((item: ShoppingCartItem) => {
-    const subtotal = item.product.price * item.amount;
-    return (
-      <TableRow key={item.shoppingCartItemId}>
-        <TableCell align="right">
-          <img src={item.product.imageUrl}
-               className={classes.rowImage}
-               alt={item.product.name}/>
-        </TableCell>
-        <TableCell align="right">{item.product.name}</TableCell>
-        <TableCell align="right">$ {commaFormat(item.product.price)}</TableCell>
-        <TableCell align="right">{item.amount}</TableCell>
-        <TableCell align="right">$ {commaFormat(subtotal)}</TableCell>
-        <TableCell align="right">
-          <IconButton color="secondary"><DeleteForeverIcon/></IconButton>
-        </TableCell>
-      </TableRow>
-    );
-  });
+  const rows =
+    shoppingCart &&
+    shoppingCart.items.map((item: ShoppingCartItem) => {
+      const subtotal = item.product.price * item.amount;
+      return (
+        <TableRow key={item.shoppingCartItemId}>
+          <TableCell align="right">
+            <img
+              src={item.product.imageUrl}
+              className={classes.rowImage}
+              alt={item.product.name}
+            />
+          </TableCell>
+          <TableCell align="right">{item.product.name}</TableCell>
+          <TableCell align="right">
+            $ {commaFormat(item.product.price)}
+          </TableCell>
+          <TableCell align="right">{item.amount}</TableCell>
+          <TableCell align="right">$ {commaFormat(subtotal)}</TableCell>
+          <TableCell align="right">
+            <IconButton color="secondary">
+              <DeleteForeverIcon />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+      );
+    });
 
   return (
     <Grid container>
-      <TopBanner/>
+      <TopBanner />
       <Grid
         container
         item
         xs={12}
         direction="row"
         justify="center"
-        alignItems="center">
-
+        alignItems="center"
+      >
         <Container className={classes.shoppingCartWrap}>
           <Card>
             <CardContent className={classes.cardContent}>
               <Table className={classes.table}>
                 <TableHead>
                   <TableRow>
-                    <TableCell/>
+                    <TableCell />
                     <TableCell align="right">Product</TableCell>
                     <TableCell align="right">Price</TableCell>
                     <TableCell align="right">QTY</TableCell>
                     <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right"/>
+                    <TableCell align="right" />
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {!isFetching && rows}
 
                   <TableRow>
-                    <TableCell colSpan={2}/>
+                    <TableCell colSpan={2} />
                     <TableCell align="right">Total</TableCell>
                     <TableCell align="right">$ 300.00</TableCell>
-                    <TableCell align="right"
-                               colSpan={2}>
+                    <TableCell align="right" colSpan={2}>
                       <Button
                         type="button"
                         fullWidth
@@ -107,7 +117,7 @@ export default function ShoppingCart(props: Props) {
                         color="primary"
                         size="large"
                         className={classes.submit}
-                        startIcon={<CreditCardIcon/>}
+                        startIcon={<CreditCardIcon />}
                         component={Link}
                         to="/shopping-cart/checkout"
                       >
@@ -118,16 +128,14 @@ export default function ShoppingCart(props: Props) {
                 </TableBody>
               </Table>
 
-              {isFetching &&
-              <Grid container
-                    alignItems="center"
-                    justify="center">
-                <CircularProgress className={classes.loading}/>
-              </Grid>}
+              {isFetching && (
+                <Grid container alignItems="center" justify="center">
+                  <CircularProgress className={classes.loading} />
+                </Grid>
+              )}
             </CardContent>
           </Card>
         </Container>
-
       </Grid>
     </Grid>
   );

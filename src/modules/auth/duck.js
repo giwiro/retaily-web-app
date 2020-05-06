@@ -113,7 +113,11 @@ export const loginEpic = (action$: ActionsObservable) =>
       }).pipe(
         map((user: User) => new LoginSuccess({user})),
         catchError((error: AjaxError) =>
-          of(new LoginErrorFn({error: error.response.message}))
+          of(
+            new LoginErrorFn({
+              error: error.response ? error.response.message : '',
+            })
+          )
         )
       )
     )
@@ -131,7 +135,11 @@ export const registerEpic = (action$: ActionsObservable) =>
       }).pipe(
         map((user: User) => new RegisterSuccess({user})),
         catchError((error: AjaxError) =>
-          of(new RegisterErrorFn({error: error.response.message}))
+          of(
+            new RegisterErrorFn({
+              error: error.response ? error.response.message : '',
+            })
+          )
         )
       )
     )

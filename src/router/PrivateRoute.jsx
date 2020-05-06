@@ -13,19 +13,29 @@ type Props = {|
   exact: boolean,
 |};
 
-export const PrivateRoute = ({component: Component, componentProps, user, initialAuthDone, ...rest}: Props) => (
+export const PrivateRoute = ({
+  component: Component,
+  componentProps,
+  user,
+  initialAuthDone,
+  ...rest
+}: Props) => (
   <Route
     {...rest}
     render={props => {
       if (!initialAuthDone) return null;
-      const content = <Component {...componentProps}/>;
-      return user ? content :
-        (<Redirect
+      const content = <Component {...componentProps} />;
+      return user ? (
+        content
+      ) : (
+        <Redirect
           to={{
             pathname: '/',
             search: '?login-modal=true',
             state: {from: props.location},
-          }}/>);
+          }}
+        />
+      );
     }}
   />
 );
