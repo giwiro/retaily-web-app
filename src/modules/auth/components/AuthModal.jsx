@@ -10,8 +10,13 @@ import RegisterForm from './RegisterForm';
 type Props = {|
   open: boolean,
   handleClose: () => void,
-  login: ({ email: string, password: string }) => void,
-  register: ({ firstName: string, lastName: string, email: string, password: string }) => void,
+  login: ({email: string, password: string}) => void,
+  register: ({
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+  }) => void,
   isAuthenticating?: boolean,
   loginError?: string,
   registerError?: string,
@@ -21,7 +26,7 @@ type State = {|
   showLogin: boolean,
 |};
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   modal: {
     display: 'flex',
     alignItems: 'center',
@@ -81,16 +86,22 @@ export default function AuthModal(props: Props, state: State) {
       <div className={classes.paper}>
         <div>
           <div className={isAuthenticating ? classes.authWrapLoading : ''}>
-            {showLogin &&
-            <LoginForm handleClickShowRegister={handleClickShowRegister}
-                       login={login}
-                       loginError={loginError}/>}
-            {!showLogin &&
-            <RegisterForm handleClickShowLogin={handleClickShowLogin}
-                          register={register}
-                          registerError={registerError}/>}
+            {showLogin && (
+              <LoginForm
+                handleClickShowRegister={handleClickShowRegister}
+                login={login}
+                loginError={loginError}
+              />
+            )}
+            {!showLogin && (
+              <RegisterForm
+                handleClickShowLogin={handleClickShowLogin}
+                register={register}
+                registerError={registerError}
+              />
+            )}
           </div>
-          {isAuthenticating && <CircularProgress className={classes.loading}/>}
+          {isAuthenticating && <CircularProgress className={classes.loading} />}
         </div>
       </div>
     </Modal>

@@ -12,7 +12,7 @@ import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Copyright from '../../../elements/Copyright/Copyright';
-import { useForm } from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 
 import {useStyles} from './CommonFormStyle';
 
@@ -27,7 +27,7 @@ export default function LoginForm(props: Props) {
   const {handleClickShowRegister, loginError} = props;
   const {handleSubmit, register, errors} = useForm();
 
-  const onSubmit = (values) => {
+  const onSubmit = values => {
     const {login} = props;
     login({
       email: values.email,
@@ -39,11 +39,17 @@ export default function LoginForm(props: Props) {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Avatar className={classes.avatar}><LockOutlinedIcon /></Avatar>
-        <Typography component="h1" variant="h5">Login</Typography>
-        <form className={classes.form}
-              onSubmit={handleSubmit(onSubmit)}
-              noValidate>
+        <Avatar className={classes.avatar}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Login
+        </Typography>
+        <form
+          className={classes.form}
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+        >
           <TextField
             variant="outlined"
             margin="normal"
@@ -60,8 +66,8 @@ export default function LoginForm(props: Props) {
               required: 'Required',
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                message: "Invalid email address"
-              }
+                message: 'Invalid email address',
+              },
             })}
           />
           <TextField
@@ -78,10 +84,16 @@ export default function LoginForm(props: Props) {
             helperText={errors.password ? errors.password.message : ''}
             inputRef={register({required: 'Required'})}
           />
-          {loginError && <Typography component="p"
-                                     variant="body1"
-                                     className={classes.errorText}
-                                     color="error">{loginError}</Typography>}
+          {loginError && (
+            <Typography
+              component="p"
+              variant="body1"
+              className={classes.errorText}
+              color="error"
+            >
+              {loginError}
+            </Typography>
+          )}
           <Button
             type="submit"
             fullWidth
@@ -92,18 +104,15 @@ export default function LoginForm(props: Props) {
           >
             Sign In
           </Button>
-          <Grid container
-                justify="flex-end">
+          <Grid container justify="flex-end">
             <Grid item>
-              <Link href="#"
-                    onClick={handleClickShowRegister}
-                    variant="body2">
+              <Link href="#" onClick={handleClickShowRegister} variant="body2">
                 {"Don't have an account? Register here"}
               </Link>
             </Grid>
           </Grid>
           <Box mt={6}>
-            <Copyright/>
+            <Copyright />
           </Box>
         </form>
       </div>

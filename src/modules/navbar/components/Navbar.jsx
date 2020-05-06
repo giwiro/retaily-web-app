@@ -48,7 +48,8 @@ export default function Navbar(props: Props, state: State) {
   const [anchorEl, setAnchorEl] = useState(null);
   const classes = useStyles();
 
-  const handleClickAuthMenu = (event: Event) => setAnchorEl(event.currentTarget);
+  const handleClickAuthMenu = (event: Event) =>
+    setAnchorEl(event.currentTarget);
 
   const handleCloseAuthMenu = () => setAnchorEl(null);
 
@@ -77,45 +78,51 @@ export default function Navbar(props: Props, state: State) {
     <>
       <AppBar position="static">
         <Toolbar>
-          <Link to="/"
-                className={classes.iconLink}>
-            <img src={logo}
-                 alt="logo"
-                 className={classes.logo}/>
+          <Link to="/" className={classes.iconLink}>
+            <img src={logo} alt="logo" className={classes.logo} />
           </Link>
-          <div className={classes.grow}/>
-          <Link to="/shopping-cart"
-                className={classes.iconLink}>
-              <IconButton color="inherit"
-                          onClick={handleClickShoppingCart}>
-                <Badge badgeContent={shoppingCart ? shoppingCart.items.length : 0}
-                       color="secondary">
-                  <ShoppingCartIcon/>
-                </Badge>
-              </IconButton>
+          <div className={classes.grow} />
+          <Link to="/shopping-cart" className={classes.iconLink}>
+            <IconButton color="inherit" onClick={handleClickShoppingCart}>
+              <Badge
+                badgeContent={shoppingCart ? shoppingCart.items.length : 0}
+                color="secondary"
+              >
+                <ShoppingCartIcon />
+              </Badge>
+            </IconButton>
           </Link>
-          <IconButton color="inherit"
-                      onClick={handleClickAuthMenu}>
-            <AccountCircleIcon/>
+          <IconButton color="inherit" onClick={handleClickAuthMenu}>
+            <AccountCircleIcon />
           </IconButton>
-          {anchorEl && <Menu
-            id="user-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={!!anchorEl}
-            onClose={handleCloseAuthMenu}
-          >
-            {!user && [
-              <MenuItem key="login" onClick={handleClickLogin}>Login</MenuItem>,
-            ]}
-            {user && [
-              <MenuItem key="my-orders"
-                        to="/my-orders"
-                        component={Link}
-                        onClick={handleCloseAuthMenu}>My orders</MenuItem>,
-              <MenuItem key="logout" onClick={handleClickLogout}>Logout</MenuItem>,
-            ]}
-          </Menu>}
+          {anchorEl && (
+            <Menu
+              id="user-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={!!anchorEl}
+              onClose={handleCloseAuthMenu}
+            >
+              {!user && [
+                <MenuItem key="login" onClick={handleClickLogin}>
+                  Login
+                </MenuItem>,
+              ]}
+              {user && [
+                <MenuItem
+                  key="my-orders"
+                  to="/my-orders"
+                  component={Link}
+                  onClick={handleCloseAuthMenu}
+                >
+                  My orders
+                </MenuItem>,
+                <MenuItem key="logout" onClick={handleClickLogout}>
+                  Logout
+                </MenuItem>,
+              ]}
+            </Menu>
+          )}
         </Toolbar>
       </AppBar>
     </>
