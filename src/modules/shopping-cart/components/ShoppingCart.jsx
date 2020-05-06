@@ -24,6 +24,7 @@ import type {
   ShoppingCart as ShoppingCartEntity,
   ShoppingCartItem,
 } from '../../../entities';
+import Typography from '@material-ui/core/Typography';
 
 type Props = {
   shoppingCart?: ShoppingCartEntity,
@@ -42,6 +43,9 @@ export const useStyles = makeStyles(theme => ({
   },
   loading: {
     marginTop: theme.spacing(21),
+  },
+  noBorderRow: {
+    border: 'none',
   },
 }));
 
@@ -103,28 +107,63 @@ export default function ShoppingCart(props: Props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {!isFetching && rows}
-
-                  <TableRow>
-                    <TableCell colSpan={2} />
-                    <TableCell align="right">Total</TableCell>
-                    <TableCell align="right">$ 300.00</TableCell>
-                    <TableCell align="right" colSpan={2}>
-                      <Button
-                        type="button"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        size="large"
-                        className={classes.submit}
-                        startIcon={<CreditCardIcon />}
-                        component={Link}
-                        to="/shopping-cart/checkout"
-                      >
-                        Checkout
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                  {!isFetching && shoppingCart && (
+                    <>
+                      {rows}
+                      <TableRow>
+                        <TableCell colSpan={2} />
+                        <TableCell align="right">Total</TableCell>
+                        <TableCell align="right">$ 300.00</TableCell>
+                        <TableCell align="right" colSpan={2}>
+                          <Button
+                            type="button"
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            size="large"
+                            className={classes.submit}
+                            startIcon={<CreditCardIcon />}
+                            component={Link}
+                            to="/shopping-cart/checkout"
+                          >
+                            Checkout
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    </>
+                  )}
+                  {!isFetching && !shoppingCart && (
+                    <>
+                      {Array(4)
+                        .fill(0)
+                        .map(_ => (
+                          <TableRow>
+                            <TableCell
+                              colSpan={100}
+                              align="center"
+                              className={classes.noBorderRow}
+                            />
+                          </TableRow>
+                        ))}
+                      <TableRow>
+                        <TableCell
+                          colSpan={100}
+                          align="center"
+                          className={classes.noBorderRow}
+                        >
+                          <Typography
+                            variant="body1"
+                            color="textSecondary"
+                            align="center"
+                          >
+                            {'There are no items in your shopping cart'}
+                            <br />
+                            <Link to="/">Continue shopping</Link>
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    </>
+                  )}
                 </TableBody>
               </Table>
 
