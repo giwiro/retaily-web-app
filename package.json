@@ -1,7 +1,7 @@
 {
   "name": "retaily-web-app",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.0.1",
+  "private": false,
   "dependencies": {
     "@material-ui/core": "^4.9.10",
     "@material-ui/icons": "^4.9.1",
@@ -26,6 +26,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint . --ext jsx --ext js",
+    "version": "echo $npm_package_version",
     "flow": "flow"
   },
   "eslintConfig": {
