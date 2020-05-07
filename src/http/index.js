@@ -12,7 +12,7 @@ export type RequestOptions = {|
   headers?: {[key: string]: string},
 |};
 
-type RequestMethod = 'GET' | 'POST';
+type RequestMethod = 'GET' | 'POST' | 'DELETE';
 
 function httpCreatorFactory(
   method: RequestMethod,
@@ -48,6 +48,7 @@ function httpCreatorFactory(
   switch (method) {
     case 'GET':
     case 'POST':
+    case 'DELETE':
       return ajax({
         url,
         method,
@@ -68,3 +69,8 @@ export const postCreator = (route: string) => (
   body: {[key: string]: any},
   o?: RequestOptions
 ) => httpCreatorFactory('POST', route, {body, ...o});
+
+export const deleteCreator = (route: string) => (
+  body: {[key: string]: any},
+  o?: RequestOptions
+) => httpCreatorFactory('DELETE', route, {body, ...o});

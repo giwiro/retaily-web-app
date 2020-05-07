@@ -5,6 +5,8 @@ import {combineEpics} from 'redux-observable';
 import type {Action} from '../store/utils';
 import type {AuthState} from './auth/duck';
 import type {ShoppingCartState} from './shopping-cart/duck';
+import type {LocalValuesState} from './local-values/duck';
+import type {ProductsState} from './products/duck';
 
 import authReducer, {
   initialState as AuthInitialState,
@@ -18,21 +20,38 @@ import authReducer, {
 import shoppingCartReducer, {
   initialState as ShoppingCartInitialState,
   fetchShoppingCartEpic,
+  deleteShoppingCartItemEpic,
 } from './shopping-cart/duck';
+
+import localValuesReducer, {
+  initialState as LocalValuesInitialState,
+  fetchCategoriesEpic,
+} from './local-values/duck';
+
+import productsReducer, {
+  initialState as ProductsInitialState,
+  fetchProductsEpic,
+} from './products/duck';
 
 export type RootState = {
   auth: AuthState,
   shoppingCart: ShoppingCartState,
+  localValues: LocalValuesState,
+  products: ProductsState,
 };
 
 export const defaultInitialState = {
   auth: AuthInitialState,
   shoppingCart: ShoppingCartInitialState,
+  localValues: LocalValuesInitialState,
+  products: ProductsInitialState,
 };
 
 export const appReducer = combineReducers({
   auth: authReducer,
   shoppingCart: shoppingCartReducer,
+  localValues: localValuesReducer,
+  products: productsReducer,
 });
 
 export const rootEpic = combineEpics(
@@ -42,7 +61,12 @@ export const rootEpic = combineEpics(
   registerEpic,
   logoutEpic,
   // shopping-cart
-  fetchShoppingCartEpic
+  fetchShoppingCartEpic,
+  deleteShoppingCartItemEpic,
+  // local-values
+  fetchCategoriesEpic,
+  // products
+  fetchProductsEpic
 );
 
 export const rootReducer = (state: RootState, action: Action) => {

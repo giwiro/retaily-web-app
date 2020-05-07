@@ -29,6 +29,7 @@ import Typography from '@material-ui/core/Typography';
 type Props = {
   shoppingCart?: ShoppingCartEntity,
   isFetching?: boolean,
+  deleteShoppingCartItem: ({productId: number}) => void,
 };
 
 export const useStyles = makeStyles(theme => ({
@@ -50,15 +51,23 @@ export const useStyles = makeStyles(theme => ({
 }));
 
 export default function ShoppingCart(props: Props) {
-  const {shoppingCart, isFetching} = props;
+  const {shoppingCart, isFetching, deleteShoppingCartItem} = props;
   const classes = useStyles();
+
+  const total =
+    shoppingCart &&
+    shoppingCart.items.reduce(
+      (acum: number, item: ShoppingCartItem) =>
+        acum + item.product.price * item.amount,
+      0
+    );
 
   const rows =
     shoppingCart &&
     shoppingCart.items.map((item: ShoppingCartItem) => {
       const subtotal = item.product.price * item.amount;
       return (
-        <TableRow key={item.shoppingCartItemId}>
+        <TableRow key={item.id}>
           <TableCell align="right">
             <img
               src={item.product.imageUrl}
@@ -73,7 +82,12 @@ export default function ShoppingCart(props: Props) {
           <TableCell align="right">{item.amount}</TableCell>
           <TableCell align="right">$ {commaFormat(subtotal)}</TableCell>
           <TableCell align="right">
-            <IconButton color="secondary">
+            <IconButton
+              color="secondary"
+              onClick={() =>
+                deleteShoppingCartItem({productId: item.product.id})
+              }
+            >
               <DeleteForeverIcon />
             </IconButton>
           </TableCell>
@@ -107,63 +121,68 @@ export default function ShoppingCart(props: Props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {!isFetching && shoppingCart && (
-                    <>
-                      {rows}
-                      <TableRow>
-                        <TableCell colSpan={2} />
-                        <TableCell align="right">Total</TableCell>
-                        <TableCell align="right">$ 300.00</TableCell>
-                        <TableCell align="right" colSpan={2}>
-                          <Button
-                            type="button"
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            size="large"
-                            className={classes.submit}
-                            startIcon={<CreditCardIcon />}
-                            component={Link}
-                            to="/shopping-cart/checkout"
-                          >
-                            Checkout
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    </>
-                  )}
-                  {!isFetching && !shoppingCart && (
-                    <>
-                      {Array(4)
-                        .fill(0)
-                        .map(_ => (
-                          <TableRow>
-                            <TableCell
-                              colSpan={100}
-                              align="center"
-                              className={classes.noBorderRow}
-                            />
-                          </TableRow>
-                        ))}
-                      <TableRow>
-                        <TableCell
-                          colSpan={100}
-                          align="center"
-                          className={classes.noBorderRow}
-                        >
-                          <Typography
-                            variant="body1"
-                            color="textSecondary"
+                  {!isFetching &&
+                    shoppingCart &&
+                    shoppingCart.items.length > 0 && (
+                      <>
+                        {rows}
+                        <TableRow>
+                          <TableCell colSpan={2} />
+                          <TableCell align="right">Total</TableCell>
+                          <TableCell align="right">
+                            $ {commaFormat(total)}
+                          </TableCell>
+                          <TableCell align="right" colSpan={2}>
+                            <Button
+                              type="button"
+                              fullWidth
+                              variant="contained"
+                              color="primary"
+                              size="large"
+                              className={classes.submit}
+                              startIcon={<CreditCardIcon />}
+                              component={Link}
+                              to="/shopping-cart/checkout"
+                            >
+                              Checkout
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    )}
+                  {!isFetching &&
+                    (!shoppingCart || shoppingCart.items.length === 0) && (
+                      <>
+                        {Array(4)
+                          .fill(0)
+                          .map((_, idx: number) => (
+                            <TableRow key={idx}>
+                              <TableCell
+                                colSpan={100}
+                                align="center"
+                                className={classes.noBorderRow}
+                              />
+                            </TableRow>
+                          ))}
+                        <TableRow>
+                          <TableCell
+                            colSpan={100}
                             align="center"
+                            className={classes.noBorderRow}
                           >
-                            {'There are no items in your shopping cart'}
-                            <br />
-                            <Link to="/">Continue shopping</Link>
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    </>
-                  )}
+                            <Typography
+                              variant="body1"
+                              color="textSecondary"
+                              align="center"
+                            >
+                              {'There are no items in your shopping cart'}
+                              <br />
+                              <Link to="/">Continue shopping</Link>
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    )}
                 </TableBody>
               </Table>
 
@@ -183,4 +202,5 @@ export default function ShoppingCart(props: Props) {
 ShoppingCart.propTypes = {
   shoppingCart: PropTypes.object,
   isFetching: PropTypes.bool,
+  deleteShoppingCartItem: PropTypes.func.isRequired,
 };

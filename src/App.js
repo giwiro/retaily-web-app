@@ -1,11 +1,12 @@
 // @flow
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Redirect, Route, Switch} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import type {Dispatch} from 'redux';
 import {actions as AuthActions} from './modules/auth/duck';
+import {actions as LocalValuesActions} from './modules/local-values/duck';
 import {PrivateRoute} from './router/PrivateRoute';
 import {usePrevious} from './utils/react';
 import {createMuiTheme} from '@material-ui/core';
@@ -14,6 +15,7 @@ import HomeContainer from './modules/home/containers/HomeContainer';
 import AuthModalContainer from './modules/auth/containers/AuthModalContainer';
 import NavbarContainer from './modules/navbar/containers/NavbarContainer';
 import ShoppingCartContainer from './modules/shopping-cart/containers/ShoppingCartContainer';
+import ProductsContainer from './modules/products/containers/ProductsContainer';
 
 import type {User} from './entities';
 import type {RootState} from './modules';
@@ -34,6 +36,7 @@ type Props = {|
   initialAuthDone?: boolean,
   isAuthenticating?: boolean,
   authResetState: () => void,
+  fetchCategories: () => void,
 |};
 
 type State = {|
@@ -41,10 +44,20 @@ type State = {|
 |};
 
 function App(props: Props, state: State) {
-  const {user, isAuthenticating, authResetState, initialAuthDone} = props;
+  const {
+    user,
+    isAuthenticating,
+    authResetState,
+    initialAuthDone,
+    fetchCategories,
+  } = props;
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const prevUser = usePrevious(user);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const handleClose = () => {
     if (!isAuthenticating && authModalOpen) {
@@ -73,6 +86,9 @@ function App(props: Props, state: State) {
         <Route path="/" exact>
           <HomeContainer setAuthModalOpen={setAuthModalOpen} />
         </Route>
+        <Route path="/products" exact>
+          <ProductsContainer />
+        </Route>
         <PrivateRoute
           exact
           component={ShoppingCartContainer}
@@ -89,6 +105,7 @@ App.propTypes = {
   initialAuthDone: PropTypes.bool,
   isAuthenticating: PropTypes.bool,
   authResetState: PropTypes.func.isRequired,
+  fetchCategories: PropTypes.func.isRequired,
 };
 
 export default connect(
@@ -101,6 +118,7 @@ export default connect(
     bindActionCreators(
       {
         ...AuthActions,
+        ...LocalValuesActions,
       },
       dispatch
     )

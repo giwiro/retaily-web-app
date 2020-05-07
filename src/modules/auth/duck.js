@@ -1,6 +1,6 @@
 // @flow
 import {ofType} from 'redux-observable';
-import {AjaxError, of} from 'rxjs';
+import {of} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
 import {
   ActionCreator,
@@ -9,6 +9,7 @@ import {
 } from '../../store/utils';
 import {getSessionApi, loginApi, logoutApi, registerApi} from './api';
 
+import type {AjaxError} from 'rxjs/ajax';
 import type {User} from '../../entities';
 import type {Action} from '../../store/utils';
 import type {ActionsObservable} from 'redux-observable';

@@ -2,7 +2,7 @@
 import type {Product} from './product';
 
 export type ShoppingCartItem = {
-  shoppingCartItemId: number,
+  id: number,
   shoppingCartItemStatus: string,
   product: Product,
   amount: number,
