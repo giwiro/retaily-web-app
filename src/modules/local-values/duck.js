@@ -1,8 +1,4 @@
-import {
-  ActionCreator,
-  createReducer,
-  generateActionCreators,
-} from '../../store/utils';
+import {ActionCreator, createReducer} from '../../store/utils';
 import {ofType} from 'redux-observable';
 import {catchError, map, switchMap} from 'rxjs/operators';
 import {of} from 'rxjs';
@@ -28,11 +24,9 @@ export class FetchCategories extends ActionCreator<LocalValuesAction> {}
 export class FetchCategoriesSuccess extends ActionCreator<LocalValuesAction> {}
 export class FetchCategoriesErrorFn extends ActionCreator<LocalValuesAction> {}
 
-export const actions = generateActionCreators([
-  FetchCategories,
-  FetchCategoriesSuccess,
-  FetchCategoriesErrorFn,
-]);
+export const actions = {
+  fetchCategories: (payload: LocalValuesAction) => new FetchCategories(payload),
+};
 
 export const initialState = {};
 
@@ -46,8 +40,8 @@ export default createReducer(initialState, {
   }),
 });
 
-export const fetchCategoriesEpic = (action$: ActionsObservable) =>
-  action$.pipe(
+export function fetchCategoriesEpic(action$: ActionsObservable) {
+  return action$.pipe(
     ofType(FetchCategories.type),
     switchMap(() =>
       getCategories().pipe(
@@ -65,3 +59,4 @@ export const fetchCategoriesEpic = (action$: ActionsObservable) =>
       )
     )
   );
+}

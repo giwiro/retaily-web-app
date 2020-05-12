@@ -13,7 +13,7 @@ const configureStore = (initialState: RootState = defaultInitialState) => {
   const appliedMiddlewares = applyMiddleware(...middlewares);
   let store;
 
-  if (process.env.NODE_ENV === 'development' && window) {
+  if (/*process.env.NODE_ENV === 'development' && window*/ true) {
     const composeEnhancers =
       window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
     const enhancer = composeEnhancers(appliedMiddlewares);

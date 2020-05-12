@@ -14,7 +14,7 @@ import {makeStyles} from '@material-ui/core/styles';
 
 import logo from '../../../assets/img/logo.png';
 
-import type {ShoppingCart, User} from '../../../entities';
+import type {ShoppingCart, ShoppingCartItem, User} from '../../../entities';
 
 const useStyles = makeStyles({
   logo: {
@@ -74,6 +74,14 @@ export default function Navbar(props: Props, state: State) {
     getSession();
   }, [getSession]);
 
+  const itemsTotalQuantity =
+    shoppingCart && shoppingCart.items.length > 0
+      ? shoppingCart.items.reduce(
+          (acum: number, item: ShoppingCartItem) => acum + item.amount,
+          0
+        )
+      : 0;
+
   return (
     <>
       <AppBar position="static">
@@ -84,10 +92,7 @@ export default function Navbar(props: Props, state: State) {
           <div className={classes.grow} />
           <Link to="/shopping-cart" className={classes.iconLink}>
             <IconButton color="inherit" onClick={handleClickShoppingCart}>
-              <Badge
-                badgeContent={shoppingCart ? shoppingCart.items.length : 0}
-                color="secondary"
-              >
+              <Badge badgeContent={itemsTotalQuantity} color="secondary">
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>

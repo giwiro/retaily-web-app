@@ -2,13 +2,14 @@
 import {ofType} from 'redux-observable';
 import {of} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
-import {
-  ActionCreator,
-  createReducer,
-  generateActionCreators,
-} from '../../store/utils';
+import {ActionCreator, createReducer} from '../../store/utils';
 import {GetSessionSuccess, LoginSuccess} from '../auth/duck';
-import {deleteShoppingCartItemApi, endpoints, getShoppingCartApi} from './api';
+import {
+  addShoppingCartItemApi,
+  deleteShoppingCartItemApi,
+  endpoints,
+  getShoppingCartApi,
+} from './api';
 
 import type {AjaxError} from 'rxjs/ajax';
 import type {ActionsObservable} from 'redux-observable';
@@ -19,6 +20,7 @@ export type ShoppingCartAction = Action & {
   shoppingCart?: ShoppingCart,
   error?: string,
   productId?: number,
+  amount?: number,
 };
 
 export type ShoppingCartState = {
@@ -27,23 +29,24 @@ export type ShoppingCartState = {
   fetchShoppingCartError?: string,
   isDeletingItem?: boolean,
   deleteItemError?: string,
+  isAddingItem?: boolean,
+  addItemError?: string,
 };
 
 export class FetchShoppingCart extends ActionCreator<ShoppingCartAction> {}
 export class FetchShoppingCartSuccess extends ActionCreator<ShoppingCartAction> {}
 export class FetchShoppingCartErrorFn extends ActionCreator<ShoppingCartAction> {}
+export class AddShoppingCartItem extends ActionCreator<ShoppingCartAction> {}
+export class AddShoppingCartItemSuccess extends ActionCreator<ShoppingCartAction> {}
+export class AddShoppingCartItemErrorFn extends ActionCreator<ShoppingCartAction> {}
 export class DeleteShoppingCartItem extends ActionCreator<ShoppingCartAction> {}
 export class DeleteShoppingCartItemSuccess extends ActionCreator<ShoppingCartAction> {}
 export class DeleteShoppingCartItemErrorFn extends ActionCreator<ShoppingCartAction> {}
 
-export const actions = generateActionCreators([
-  FetchShoppingCart,
-  FetchShoppingCartSuccess,
-  FetchShoppingCartErrorFn,
-  DeleteShoppingCartItem,
-  DeleteShoppingCartItemSuccess,
-  DeleteShoppingCartItemErrorFn,
-]);
+export const actions = {
+  deleteShoppingCartItem: (payload: ShoppingCartAction) =>
+    new DeleteShoppingCartItem(payload),
+};
 
 export const initialState = {};
 
@@ -54,6 +57,28 @@ export default createReducer(initialState, {
   }),
   [FetchShoppingCartErrorFn.type]: (_, action: ShoppingCartAction) => ({
     fetchShoppingCartError: action.error,
+  }),
+  [AddShoppingCartItem.type]: (state: ShoppingCartState) => ({
+    ...state,
+    isAddingItem: true,
+    addItemError: undefined,
+  }),
+  [AddShoppingCartItemSuccess.type]: (
+    state: ShoppingCartState,
+    action: ShoppingCartAction
+  ) => ({
+    ...state,
+    isAddingItem: false,
+    addItemError: undefined,
+    shoppingCart: action.shoppingCart,
+  }),
+  [AddShoppingCartItemErrorFn.type]: (
+    state: ShoppingCartState,
+    action: ShoppingCartAction
+  ) => ({
+    ...state,
+    isAddingItem: false,
+    addItemError: action.error,
   }),
   [DeleteShoppingCartItem.type]: (state: ShoppingCartState) => ({
     ...state,
@@ -79,8 +104,8 @@ export default createReducer(initialState, {
   }),
 });
 
-export const fetchShoppingCartEpic = (action$: ActionsObservable) =>
-  action$.pipe(
+export function fetchShoppingCartEpic(action$: ActionsObservable) {
+  return action$.pipe(
     ofType(FetchShoppingCart.type, LoginSuccess.type, GetSessionSuccess.type),
     switchMap((action: ShoppingCartAction) =>
       getShoppingCartApi().pipe(
@@ -98,9 +123,41 @@ export const fetchShoppingCartEpic = (action$: ActionsObservable) =>
       )
     )
   );
+}
 
-export const deleteShoppingCartItemEpic = (action$: ActionsObservable) =>
-  action$.pipe(
+export function addShoppingCartItemEpic(action$: ActionsObservable) {
+  return action$.pipe(
+    ofType(AddShoppingCartItem.type),
+    switchMap((action: ShoppingCartAction) =>
+      addShoppingCartItemApi(
+        {
+          amount: action.amount,
+        },
+        {
+          route: endpoints.ADD_SHOPPING_CART_ITEM_CART.replace(
+            ':productId',
+            action.productId
+          ),
+        }
+      ).pipe(
+        map(
+          (shoppingCart: ShoppingCart) =>
+            new AddShoppingCartItemSuccess({shoppingCart})
+        ),
+        catchError((error: AjaxError) =>
+          of(
+            new AddShoppingCartItemErrorFn({
+              error: error.response ? error.response.message : '',
+            })
+          )
+        )
+      )
+    )
+  );
+}
+
+export function deleteShoppingCartItemEpic(action$: ActionsObservable) {
+  return action$.pipe(
     ofType(DeleteShoppingCartItem.type),
     switchMap((action: ShoppingCartAction) =>
       deleteShoppingCartItemApi(undefined, {
@@ -123,3 +180,4 @@ export const deleteShoppingCartItemEpic = (action$: ActionsObservable) =>
       )
     )
   );
+}

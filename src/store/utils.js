@@ -30,7 +30,7 @@ export class ActionCreator<T> {
   }
 }
 
-export function generateActionCreators<T>(
+/*export function generateActionCreators<T>(
   classes: Class<ActionCreator<T>>[]
 ): {[key: string]: () => void} {
   const r = {};
@@ -38,7 +38,7 @@ export function generateActionCreators<T>(
     (cls: Class<ActionCreator<T>>) => (r[(cls: any).fnName] = aa => new cls(aa))
   );
   return r;
-}
+}*/
 
 export const createReducer = (
   initialState: *,

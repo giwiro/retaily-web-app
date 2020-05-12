@@ -48,6 +48,9 @@ export const useStyles = makeStyles(theme => ({
   noBorderRow: {
     border: 'none',
   },
+  moneyCellRow: {
+    width: 90,
+  },
 }));
 
 export default function ShoppingCart(props: Props) {
@@ -76,11 +79,13 @@ export default function ShoppingCart(props: Props) {
             />
           </TableCell>
           <TableCell align="right">{item.product.name}</TableCell>
-          <TableCell align="right">
+          <TableCell align="right" className={classes.moneyCellRow}>
             $ {commaFormat(item.product.price)}
           </TableCell>
           <TableCell align="right">{item.amount}</TableCell>
-          <TableCell align="right">$ {commaFormat(subtotal)}</TableCell>
+          <TableCell align="right" className={classes.moneyCellRow}>
+            $ {commaFormat(subtotal)}
+          </TableCell>
           <TableCell align="right">
             <IconButton
               color="secondary"
@@ -129,7 +134,10 @@ export default function ShoppingCart(props: Props) {
                         <TableRow>
                           <TableCell colSpan={2} />
                           <TableCell align="right">Total</TableCell>
-                          <TableCell align="right">
+                          <TableCell
+                            align="right"
+                            className={classes.moneyCellRow}
+                          >
                             $ {commaFormat(total)}
                           </TableCell>
                           <TableCell align="right" colSpan={2}>
@@ -177,7 +185,7 @@ export default function ShoppingCart(props: Props) {
                             >
                               {'There are no items in your shopping cart'}
                               <br />
-                              <Link to="/">Continue shopping</Link>
+                              <Link to="/products">Continue shopping</Link>
                             </Typography>
                           </TableCell>
                         </TableRow>

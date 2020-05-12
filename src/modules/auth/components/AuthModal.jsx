@@ -31,6 +31,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    margin: theme.spacing(0, 3),
   },
   paper: {
     width: 500,

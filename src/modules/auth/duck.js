@@ -2,11 +2,7 @@
 import {ofType} from 'redux-observable';
 import {of} from 'rxjs';
 import {catchError, map, switchMap} from 'rxjs/operators';
-import {
-  ActionCreator,
-  createReducer,
-  generateActionCreators,
-} from '../../store/utils';
+import {ActionCreator, createReducer} from '../../store/utils';
 import {getSessionApi, loginApi, logoutApi, registerApi} from './api';
 
 import type {AjaxError} from 'rxjs/ajax';
@@ -42,20 +38,13 @@ export class Logout extends ActionCreator<AuthAction> {}
 export class AuthResetState extends ActionCreator<AuthAction> {}
 export class AuthNoop extends ActionCreator<AuthAction> {}
 
-export const actions = generateActionCreators([
-  GetSession,
-  GetSessionSuccess,
-  GetSessionErrorFn,
-  Login,
-  LoginSuccess,
-  LoginErrorFn,
-  Register,
-  RegisterSuccess,
-  RegisterErrorFn,
-  Logout,
-  AuthResetState,
-  AuthNoop,
-]);
+export const actions = {
+  getSession: (payload: AuthAction) => new GetSession(payload),
+  login: (payload: AuthAction) => new Login(payload),
+  register: (payload: AuthAction) => new Register(payload),
+  logout: (payload: AuthAction) => new Logout(payload),
+  authResetState: (payload: AuthAction) => new AuthResetState(payload),
+};
 
 export const initialState = {};
 
@@ -93,8 +82,8 @@ export default createReducer(initialState, {
   [AuthNoop.type]: (state: AuthState) => state,
 });
 
-export const getSessionEpic = (action$: ActionsObservable) =>
-  action$.pipe(
+export function getSessionEpic(action$: ActionsObservable) {
+  return action$.pipe(
     ofType(GetSession.type),
     switchMap(() =>
       getSessionApi().pipe(
@@ -103,9 +92,10 @@ export const getSessionEpic = (action$: ActionsObservable) =>
       )
     )
   );
+}
 
-export const loginEpic = (action$: ActionsObservable) =>
-  action$.pipe(
+export function loginEpic(action$: ActionsObservable) {
+  return action$.pipe(
     ofType(Login.type),
     switchMap((action: AuthAction) =>
       loginApi({
@@ -123,9 +113,10 @@ export const loginEpic = (action$: ActionsObservable) =>
       )
     )
   );
+}
 
-export const registerEpic = (action$: ActionsObservable) =>
-  action$.pipe(
+export function registerEpic(action$: ActionsObservable) {
+  return action$.pipe(
     ofType(Register.type),
     switchMap((action: AuthAction) =>
       registerApi({
@@ -145,9 +136,10 @@ export const registerEpic = (action$: ActionsObservable) =>
       )
     )
   );
+}
 
-export const logoutEpic = (action$: ActionsObservable) =>
-  action$.pipe(
+export function logoutEpic(action$: ActionsObservable) {
+  return action$.pipe(
     ofType(Logout.type),
     switchMap(() =>
       logoutApi().pipe(
@@ -156,3 +148,4 @@ export const logoutEpic = (action$: ActionsObservable) =>
       )
     )
   );
+}

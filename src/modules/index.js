@@ -20,6 +20,7 @@ import authReducer, {
 import shoppingCartReducer, {
   initialState as ShoppingCartInitialState,
   fetchShoppingCartEpic,
+  addShoppingCartItemEpic,
   deleteShoppingCartItemEpic,
 } from './shopping-cart/duck';
 
@@ -54,20 +55,20 @@ export const appReducer = combineReducers({
   products: productsReducer,
 });
 
-export const rootEpic = combineEpics(
-  // auth
-  getSessionEpic,
+export const rootEpic = combineEpics();
+// auth
+/*getSessionEpic,
   loginEpic,
   registerEpic,
   logoutEpic,
   // shopping-cart
   fetchShoppingCartEpic,
+  addShoppingCartItemEpic,
   deleteShoppingCartItemEpic,
   // local-values
   fetchCategoriesEpic,
   // products
-  fetchProductsEpic
-);
+  fetchProductsEpic*/
 
 export const rootReducer = (state: RootState, action: Action) => {
   // Clear higher order state when logout

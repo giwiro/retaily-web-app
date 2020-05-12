@@ -12,11 +12,13 @@ import CardActions from '@material-ui/core/CardActions';
 import IconButton from '@material-ui/core/IconButton';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import {commaFormat} from '../../../utils/number';
+import Divider from '@material-ui/core/Divider';
 
 import type {Product} from '../../../entities';
 
 type Props = {
   product: Product,
+  handleClickAddProduct: (product: Product) => void,
 };
 
 export const useStyles = makeStyles(theme => ({
@@ -48,12 +50,12 @@ export const useStyles = makeStyles(theme => ({
 }));
 
 export default function SingleProduct(props: Props) {
-  const {product} = props;
+  const {product, handleClickAddProduct} = props;
   const classes = useStyles();
 
   return (
     <Card>
-      <CardActionArea>
+      <CardActionArea onClick={() => handleClickAddProduct(product)}>
         <CardMedia
           image={product.imageUrl}
           className={classes.media}
@@ -82,6 +84,7 @@ export default function SingleProduct(props: Props) {
           </Hidden>
         </CardContent>
       </CardActionArea>
+      <Divider />
       <CardActions className={classes.cardActions}>
         <Typography
           component="p"
@@ -91,7 +94,10 @@ export default function SingleProduct(props: Props) {
         >
           $ {commaFormat(product.price)}
         </Typography>
-        <IconButton className={classes.addProduct}>
+        <IconButton
+          className={classes.addProduct}
+          onClick={() => handleClickAddProduct(product)}
+        >
           <ShoppingCartIcon />
         </IconButton>
       </CardActions>
@@ -101,4 +107,5 @@ export default function SingleProduct(props: Props) {
 
 SingleProduct.propTypes = {
   product: PropTypes.object.isRequired,
+  handleClickAddProduct: PropTypes.func.isRequired,
 };

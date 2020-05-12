@@ -12,7 +12,6 @@ import Divider from '@material-ui/core/Divider';
 import Slider from '@material-ui/core/Slider';
 import {commaFormat} from '../../../utils/number';
 import Link from '@material-ui/core/Link';
-import Container from '@material-ui/core/Container';
 
 import type {ProductCategory} from '../../../entities';
 
@@ -26,8 +25,6 @@ type Props = {|
   handleChangeSort: (newValue: string) => void,
 |};
 
-export type ProductsSortValueType = $Keys<PRODUCTS_SORT_VALUES>;
-
 export const PRODUCTS_SORT_VALUES = Object.freeze({
   PRICE_ASC: {
     value: 'PRICE_ASC',
@@ -38,6 +35,8 @@ export const PRODUCTS_SORT_VALUES = Object.freeze({
     label: 'Price: high to low',
   },
 });
+
+export type ProductsSortValueType = $Keys<PRODUCTS_SORT_VALUES>;
 
 export const useStyles = makeStyles(theme => ({
   title: {

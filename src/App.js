@@ -87,7 +87,10 @@ function App(props: Props, state: State) {
           <HomeContainer setAuthModalOpen={setAuthModalOpen} />
         </Route>
         <Route path="/products" exact>
-          <ProductsContainer />
+          <ProductsContainer
+            setAuthModalOpen={setAuthModalOpen}
+            authModalOpen={authModalOpen}
+          />
         </Route>
         <PrivateRoute
           exact
