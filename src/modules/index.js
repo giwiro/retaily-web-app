@@ -10,7 +10,7 @@ import type {ProductsState} from './products/duck';
 
 import authReducer, {
   initialState as AuthInitialState,
-  Logout,
+  actions as authActions,
   getSessionEpic,
   loginEpic,
   registerEpic,
@@ -55,9 +55,9 @@ export const appReducer = combineReducers({
   products: productsReducer,
 });
 
-export const rootEpic = combineEpics();
-// auth
-/*getSessionEpic,
+export const rootEpic = combineEpics(
+  // auth
+  getSessionEpic,
   loginEpic,
   registerEpic,
   logoutEpic,
@@ -68,11 +68,12 @@ export const rootEpic = combineEpics();
   // local-values
   fetchCategoriesEpic,
   // products
-  fetchProductsEpic*/
+  fetchProductsEpic
+);
 
 export const rootReducer = (state: RootState, action: Action) => {
   // Clear higher order state when logout
-  if (action.type === Logout.type) {
+  if (action.type === authActions.logout.type) {
     // But keep localValue (these are agnostic)
     state = {...defaultInitialState};
   }

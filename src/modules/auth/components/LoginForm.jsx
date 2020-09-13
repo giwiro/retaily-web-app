@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Copyright from '../../../elements/Copyright/Copyright';
+import Copyright from './Copyright';
 import {useForm} from 'react-hook-form';
 
 import {useStyles} from './CommonFormStyle';

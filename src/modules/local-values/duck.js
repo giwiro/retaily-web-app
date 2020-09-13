@@ -1,11 +1,9 @@
-import {ActionCreator, createReducer} from '../../store/utils';
+import {ActionCreator, buildCatchError, createReducer} from '../../store/utils';
 import {ofType} from 'redux-observable';
-import {catchError, map, switchMap} from 'rxjs/operators';
-import {of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 import {getCategories} from './api';
 
 import type {Action} from '../../store/utils';
-import type {AjaxError} from 'rxjs/ajax';
 import type {ProductCategory} from '../../entities';
 import type {ActionsObservable} from 'redux-observable';
 
@@ -49,13 +47,7 @@ export function fetchCategoriesEpic(action$: ActionsObservable) {
           (categories: ProductCategory[]) =>
             new FetchCategoriesSuccess({categories})
         ),
-        catchError((error: AjaxError) =>
-          of(
-            new FetchCategoriesErrorFn({
-              error: error.response ? error.response.message : '',
-            })
-          )
-        )
+        buildCatchError(FetchCategoriesErrorFn)
       )
     )
   );

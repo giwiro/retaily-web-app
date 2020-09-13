@@ -12,7 +12,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import {useForm} from 'react-hook-form';
-import Copyright from '../../../elements/Copyright/Copyright';
+import Copyright from './Copyright';
 
 import {useStyles} from './CommonFormStyle';
 

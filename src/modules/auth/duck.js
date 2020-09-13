@@ -1,11 +1,9 @@
 // @flow
 import {ofType} from 'redux-observable';
-import {of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
-import {ActionCreator, createReducer} from '../../store/utils';
+import {map, switchMap} from 'rxjs/operators';
+import {createReducer, eCatchError, g} from '../../store/utils';
 import {getSessionApi, loginApi, logoutApi, registerApi} from './api';
 
-import type {AjaxError} from 'rxjs/ajax';
 import type {User} from '../../entities';
 import type {Action} from '../../store/utils';
 import type {ActionsObservable} from 'redux-observable';
@@ -25,70 +23,79 @@ export type AuthState = {
   initialAuthDone?: boolean,
 };
 
-export class GetSession extends ActionCreator<AuthAction> {}
-export class GetSessionSuccess extends ActionCreator<AuthAction> {}
-export class GetSessionErrorFn extends ActionCreator<AuthAction> {}
-export class Login extends ActionCreator<AuthAction> {}
-export class LoginSuccess extends ActionCreator<AuthAction> {}
-export class LoginErrorFn extends ActionCreator<AuthAction> {}
-export class Register extends ActionCreator<AuthAction> {}
-export class RegisterSuccess extends ActionCreator<AuthAction> {}
-export class RegisterErrorFn extends ActionCreator<AuthAction> {}
-export class Logout extends ActionCreator<AuthAction> {}
-export class AuthResetState extends ActionCreator<AuthAction> {}
-export class AuthNoop extends ActionCreator<AuthAction> {}
+export const getSession = g<AuthAction>('auth/get-session');
+export const getSessionSuccess = g<AuthAction>('auth/get-session-success');
+export const getSessionErrorFn = g<AuthAction>('auth/get-session-error');
+export const login = g<AuthAction>('auth/login');
+export const loginSuccess = g<AuthAction>('auth/login-success');
+export const loginErrorFn = g<AuthAction>('auth/login-error');
+export const register = g<AuthAction>('auth/register');
+export const registerSuccess = g<AuthAction>('auth/register-success');
+export const registerErrorFn = g<AuthAction>('auth/register-error');
+export const logout = g<AuthAction>('auth/logout');
+export const authResetState = g<AuthAction>('auth/reset-state');
+export const noop = g<AuthAction>('auth/noop');
 
 export const actions = {
-  getSession: (payload: AuthAction) => new GetSession(payload),
-  login: (payload: AuthAction) => new Login(payload),
-  register: (payload: AuthAction) => new Register(payload),
-  logout: (payload: AuthAction) => new Logout(payload),
-  authResetState: (payload: AuthAction) => new AuthResetState(payload),
+  getSession,
+  getSessionSuccess,
+  getSessionErrorFn,
+  login,
+  loginSuccess,
+  loginErrorFn,
+  register,
+  registerSuccess,
+  registerErrorFn,
+  logout,
+  authResetState,
 };
 
 export const initialState = {};
 
-export default createReducer(initialState, {
-  [GetSession.type]: () => ({isAuthenticating: true}),
-  [GetSessionSuccess.type]: (_, action: AuthAction) => ({
+export default createReducer<AuthState, AuthAction>(initialState, {
+  [getSession]: () => ({isAuthenticating: true}),
+  [getSessionSuccess]: (_, action: AuthAction) => ({
     user: action.user,
     initialAuthDone: true,
   }),
-  [GetSessionErrorFn.type]: () => ({initialAuthDone: true}),
-  [Login.type]: (state: AuthState) => ({...state, isAuthenticating: true}),
-  [LoginSuccess.type]: (state: AuthState, action: AuthAction) => ({
+  [getSessionErrorFn]: () => ({initialAuthDone: true}),
+  [login]: (state: AuthState) => ({...state, isAuthenticating: true}),
+  [loginSuccess]: (state: AuthState, action: AuthAction) => ({
     ...state,
     user: action.user,
     isAuthenticating: false,
   }),
-  [LoginErrorFn.type]: (state: AuthState, action: AuthAction) => ({
+  [loginErrorFn]: (state: AuthState, action: AuthAction) => ({
     ...state,
     loginError: action.error,
     isAuthenticating: false,
   }),
-  [Register.type]: (state: AuthState) => ({...state, isAuthenticating: true}),
-  [RegisterSuccess.type]: (state: AuthState, action: AuthAction) => ({
+  [register]: (state: AuthState) => ({
+    ...state,
+    isAuthenticating: true,
+  }),
+  [registerSuccess]: (state: AuthState, action: AuthAction) => ({
     ...state,
     user: action.user,
     isAuthenticating: false,
   }),
-  [RegisterErrorFn.type]: (state: AuthState, action: AuthAction) => ({
+  [registerErrorFn]: (state: AuthState, action: AuthAction) => ({
     ...state,
     registerError: action.error,
     isAuthenticating: false,
   }),
-  [Logout.type]: () => ({...initialState, initialAuthDone: true}),
-  [AuthResetState.type]: () => initialState,
-  [AuthNoop.type]: (state: AuthState) => state,
+  [logout]: () => ({...initialState, initialAuthDone: true}),
+  [authResetState]: () => initialState,
+  [noop]: (state: AuthState) => state,
 });
 
 export function getSessionEpic(action$: ActionsObservable) {
   return action$.pipe(
-    ofType(GetSession.type),
+    ofType(getSession.type),
     switchMap(() =>
       getSessionApi().pipe(
-        map((user: User) => new GetSessionSuccess({user})),
-        catchError(() => of(new GetSessionErrorFn()))
+        map((user: User) => getSessionSuccess({user})),
+        eCatchError(getSessionErrorFn)
       )
     )
   );
@@ -96,28 +103,23 @@ export function getSessionEpic(action$: ActionsObservable) {
 
 export function loginEpic(action$: ActionsObservable) {
   return action$.pipe(
-    ofType(Login.type),
-    switchMap((action: AuthAction) =>
-      loginApi({
+    ofType(login.type),
+    switchMap((action: AuthAction) => {
+      console.log('action', action);
+      return loginApi({
         email: action.email,
         password: action.password,
       }).pipe(
-        map((user: User) => new LoginSuccess({user})),
-        catchError((error: AjaxError) =>
-          of(
-            new LoginErrorFn({
-              error: error.response ? error.response.message : '',
-            })
-          )
-        )
-      )
-    )
+        map((user: User) => loginSuccess({user})),
+        eCatchError(loginErrorFn)
+      );
+    })
   );
 }
 
 export function registerEpic(action$: ActionsObservable) {
   return action$.pipe(
-    ofType(Register.type),
+    ofType(register.type),
     switchMap((action: AuthAction) =>
       registerApi({
         firstName: action.firstName,
@@ -125,14 +127,8 @@ export function registerEpic(action$: ActionsObservable) {
         email: action.email,
         password: action.password,
       }).pipe(
-        map((user: User) => new RegisterSuccess({user})),
-        catchError((error: AjaxError) =>
-          of(
-            new RegisterErrorFn({
-              error: error.response ? error.response.message : '',
-            })
-          )
-        )
+        map((user: User) => registerSuccess({user})),
+        eCatchError(registerErrorFn)
       )
     )
   );
@@ -140,11 +136,11 @@ export function registerEpic(action$: ActionsObservable) {
 
 export function logoutEpic(action$: ActionsObservable) {
   return action$.pipe(
-    ofType(Logout.type),
+    ofType(logout.type),
     switchMap(() =>
       logoutApi().pipe(
-        map(() => new AuthNoop()),
-        catchError(() => of(new AuthNoop()))
+        map(() => noop()),
+        eCatchError(noop)
       )
     )
   );

@@ -1,7 +1,7 @@
 // @flow
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {actions as AuthActions} from '../../auth/duck';
+import {getSession, logout} from '../../auth/duck';
 import Navbar from '../components/Navbar';
 
 import type {Dispatch} from 'redux';
@@ -15,10 +15,5 @@ export default connect(
     shoppingCart: state.shoppingCart.shoppingCart,
   }),
   (dispatch: Dispatch<any>) =>
-    bindActionCreators(
-      {
-        ...AuthActions,
-      },
-      dispatch
-    )
+    bindActionCreators({getSession, logout}, dispatch)
 )(Navbar);

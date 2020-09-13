@@ -1,9 +1,8 @@
 // @flow
 import {ofType} from 'redux-observable';
-import {of} from 'rxjs';
-import {catchError, map, switchMap} from 'rxjs/operators';
-import {ActionCreator, createReducer} from '../../store/utils';
-import {GetSessionSuccess, LoginSuccess} from '../auth/duck';
+import {map, switchMap} from 'rxjs/operators';
+import {ActionCreator, buildCatchError, createReducer} from '../../store/utils';
+import {getSessionSuccess, loginSuccess} from '../auth/duck';
 import {
   addShoppingCartItemApi,
   deleteShoppingCartItemApi,
@@ -11,7 +10,6 @@ import {
   getShoppingCartApi,
 } from './api';
 
-import type {AjaxError} from 'rxjs/ajax';
 import type {ActionsObservable} from 'redux-observable';
 import type {Action} from '../../store/utils';
 import type {ShoppingCart} from '../../entities';
@@ -46,6 +44,8 @@ export class DeleteShoppingCartItemErrorFn extends ActionCreator<ShoppingCartAct
 export const actions = {
   deleteShoppingCartItem: (payload: ShoppingCartAction) =>
     new DeleteShoppingCartItem(payload),
+  addShoppingCartItem: (payload: ShoppingCartAction) =>
+    new AddShoppingCartItem(payload),
 };
 
 export const initialState = {};
@@ -106,20 +106,14 @@ export default createReducer(initialState, {
 
 export function fetchShoppingCartEpic(action$: ActionsObservable) {
   return action$.pipe(
-    ofType(FetchShoppingCart.type, LoginSuccess.type, GetSessionSuccess.type),
+    ofType(FetchShoppingCart.type, getSessionSuccess.type, loginSuccess.type),
     switchMap((action: ShoppingCartAction) =>
       getShoppingCartApi().pipe(
         map(
           (shoppingCart: ShoppingCart) =>
             new FetchShoppingCartSuccess({shoppingCart})
         ),
-        catchError((error: AjaxError) =>
-          of(
-            new FetchShoppingCartErrorFn({
-              error: error.response ? error.response.message : '',
-            })
-          )
-        )
+        buildCatchError(FetchShoppingCartErrorFn)
       )
     )
   );
@@ -144,13 +138,7 @@ export function addShoppingCartItemEpic(action$: ActionsObservable) {
           (shoppingCart: ShoppingCart) =>
             new AddShoppingCartItemSuccess({shoppingCart})
         ),
-        catchError((error: AjaxError) =>
-          of(
-            new AddShoppingCartItemErrorFn({
-              error: error.response ? error.response.message : '',
-            })
-          )
-        )
+        buildCatchError(AddShoppingCartItemErrorFn)
       )
     )
   );
@@ -170,13 +158,7 @@ export function deleteShoppingCartItemEpic(action$: ActionsObservable) {
           (shoppingCart: ShoppingCart) =>
             new DeleteShoppingCartItemSuccess({shoppingCart})
         ),
-        catchError((error: AjaxError) =>
-          of(
-            new DeleteShoppingCartItemErrorFn({
-              error: error.response ? error.response.message : '',
-            })
-          )
-        )
+        buildCatchError(DeleteShoppingCartItemErrorFn)
       )
     )
   );

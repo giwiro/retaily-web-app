@@ -35,6 +35,7 @@ export const useStyles = makeStyles(theme => ({
     fontWeight: 700,
     textTransform: 'uppercase',
     color: '#555',
+    padding: theme.spacing(0, 8),
   },
 }));
 

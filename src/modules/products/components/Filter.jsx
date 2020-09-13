@@ -11,7 +11,7 @@ import {Typography} from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
 import Slider from '@material-ui/core/Slider';
 import {commaFormat} from '../../../utils/number';
-import Link from '@material-ui/core/Link';
+// import Link from '@material-ui/core/Link';
 
 import type {ProductCategory} from '../../../entities';
 
@@ -111,17 +111,15 @@ export default function ProductsFilter(props: Props) {
     handleChangeCategory,
     price,
     handleChangePrice,
-    sort,
-    handleChangeSort,
   } = props;
 
-  const _handleChangeSort = (event: Event, newValue: string) => {
+  /*const _handleChangeSort = (event: Event, newValue: string) => {
     event.preventDefault();
     console.log('newValue', newValue);
     handleChangeSort(newValue);
-  };
+  };*/
 
-  const sortSection = (
+  /*const sortSection = (
     <FilterSection>
       <FilterTitle>Order by</FilterTitle>
       <Grid container>
@@ -154,7 +152,7 @@ export default function ProductsFilter(props: Props) {
         )}
       </Grid>
     </FilterSection>
-  );
+  );*/
 
   const categorySection = (
     <FilterSection>
@@ -224,7 +222,7 @@ export default function ProductsFilter(props: Props) {
 
   return (
     <>
-      {sortSection}
+      {/*{sortSection}*/}
       {categorySection}
       {priceSection}
       {ratingSection}

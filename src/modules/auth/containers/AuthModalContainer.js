@@ -2,7 +2,7 @@
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import AuthModal from '../components/AuthModal';
-import {actions as AuthActions} from '../duck';
+import {login, register} from '../duck';
 
 import type {RootState} from '../../index';
 import type {Dispatch} from 'redux';
@@ -16,7 +16,8 @@ export default connect(
   (dispatch: Dispatch<any>) =>
     bindActionCreators(
       {
-        ...AuthActions,
+        login,
+        register,
       },
       dispatch
     )

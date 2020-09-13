@@ -1,11 +1,9 @@
 // @flow
 import {ofType} from 'redux-observable';
-import {of} from 'rxjs';
-import {catchError, debounceTime, map, switchMap} from 'rxjs/operators';
-import {ActionCreator, createReducer} from '../../store/utils';
+import {debounceTime, map, switchMap} from 'rxjs/operators';
+import {ActionCreator, buildCatchError, createReducer} from '../../store/utils';
 import {getProductsApi} from './api';
 
-import type {AjaxError} from 'rxjs/ajax';
 import type {ActionsObservable} from 'redux-observable';
 import type {Action} from '../../store/utils';
 import type {Product} from '../../entities';
@@ -74,13 +72,7 @@ export function fetchProductsEpic(action$: ActionsObservable) {
               resetPagination: action.resetPagination,
             })
         ),
-        catchError((error: AjaxError) =>
-          of(
-            new FetchProductsErrorFn({
-              error: error.response ? error.response.message : '',
-            })
-          )
-        )
+        buildCatchError(FetchProductsErrorFn)
       )
     )
   );
