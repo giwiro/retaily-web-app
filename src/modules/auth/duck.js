@@ -38,14 +38,8 @@ export const noop = g<AuthAction>('auth/noop');
 
 export const actions = {
   getSession,
-  getSessionSuccess,
-  getSessionErrorFn,
   login,
-  loginSuccess,
-  loginErrorFn,
   register,
-  registerSuccess,
-  registerErrorFn,
   logout,
   authResetState,
 };
@@ -104,16 +98,15 @@ export function getSessionEpic(action$: ActionsObservable) {
 export function loginEpic(action$: ActionsObservable) {
   return action$.pipe(
     ofType(login.type),
-    switchMap((action: AuthAction) => {
-      console.log('action', action);
-      return loginApi({
+    switchMap((action: AuthAction) =>
+      loginApi({
         email: action.email,
         password: action.password,
       }).pipe(
         map((user: User) => loginSuccess({user})),
         eCatchError(loginErrorFn)
-      );
-    })
+      )
+    )
   );
 }
 

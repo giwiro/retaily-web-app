@@ -10,6 +10,8 @@ import type {RootState} from '../../index';
 
 export default connect(
   (state: RootState) => ({
+    pricing: state.shoppingCart.pricing,
+    isCalculating: state.shoppingCart.isCalculating,
     shoppingCart: state.shoppingCart.shoppingCart,
     isFetching: state.shoppingCart.isFetching,
   }),

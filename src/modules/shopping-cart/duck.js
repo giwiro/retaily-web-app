@@ -1,10 +1,17 @@
 // @flow
 import {ofType} from 'redux-observable';
 import {map, switchMap} from 'rxjs/operators';
-import {ActionCreator, buildCatchError, createReducer} from '../../store/utils';
+import {
+  ActionCreator,
+  buildCatchError,
+  createReducer,
+  eCatchError,
+  g,
+} from '../../store/utils';
 import {getSessionSuccess, loginSuccess} from '../auth/duck';
 import {
   addShoppingCartItemApi,
+  calculateApi,
   deleteShoppingCartItemApi,
   endpoints,
   getShoppingCartApi,
@@ -12,13 +19,15 @@ import {
 
 import type {ActionsObservable} from 'redux-observable';
 import type {Action} from '../../store/utils';
-import type {ShoppingCart} from '../../entities';
+import type {Pricing, ShoppingCart} from '../../entities';
+import type {AuthAction} from '../auth/duck';
 
 export type ShoppingCartAction = Action & {
   shoppingCart?: ShoppingCart,
   error?: string,
   productId?: number,
   amount?: number,
+  pricing?: Pricing,
 };
 
 export type ShoppingCartState = {
@@ -29,6 +38,8 @@ export type ShoppingCartState = {
   deleteItemError?: string,
   isAddingItem?: boolean,
   addItemError?: string,
+  isCalculating?: boolean,
+  pricing?: Pricing,
 };
 
 export class FetchShoppingCart extends ActionCreator<ShoppingCartAction> {}
@@ -40,12 +51,16 @@ export class AddShoppingCartItemErrorFn extends ActionCreator<ShoppingCartAction
 export class DeleteShoppingCartItem extends ActionCreator<ShoppingCartAction> {}
 export class DeleteShoppingCartItemSuccess extends ActionCreator<ShoppingCartAction> {}
 export class DeleteShoppingCartItemErrorFn extends ActionCreator<ShoppingCartAction> {}
+export const calculate = g<AuthAction>('shopping-cart/calculate');
+export const calculateSuccess = g<AuthAction>('auth/calculate-success');
+export const calculateErrorFn = g<AuthAction>('auth/calculate-error');
 
 export const actions = {
   deleteShoppingCartItem: (payload: ShoppingCartAction) =>
     new DeleteShoppingCartItem(payload),
   addShoppingCartItem: (payload: ShoppingCartAction) =>
     new AddShoppingCartItem(payload),
+  calculate,
 };
 
 export const initialState = {};
@@ -102,6 +117,9 @@ export default createReducer(initialState, {
     isDeletingItem: false,
     deleteItemError: action.error,
   }),
+  [calculate]: s => ({...s, isCalculating: true}),
+  [calculateSuccess]: (s, {pricing}) => ({...s, isCalculating: false, pricing}),
+  [calculateErrorFn]: s => ({...s, isCalculating: false}),
 });
 
 export function fetchShoppingCartEpic(action$: ActionsObservable) {
@@ -159,6 +177,22 @@ export function deleteShoppingCartItemEpic(action$: ActionsObservable) {
             new DeleteShoppingCartItemSuccess({shoppingCart})
         ),
         buildCatchError(DeleteShoppingCartItemErrorFn)
+      )
+    )
+  );
+}
+
+export function calculateEpic(action$: ActionsObservable) {
+  return action$.pipe(
+    ofType(
+      FetchShoppingCartSuccess.type,
+      AddShoppingCartItemSuccess.type,
+      DeleteShoppingCartItemSuccess.type
+    ),
+    switchMap((action: ShoppingCartAction) =>
+      calculateApi().pipe(
+        map((pricing: Pricing) => calculateSuccess({pricing})),
+        eCatchError(calculateErrorFn)
       )
     )
   );

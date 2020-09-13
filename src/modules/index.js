@@ -22,6 +22,7 @@ import shoppingCartReducer, {
   fetchShoppingCartEpic,
   addShoppingCartItemEpic,
   deleteShoppingCartItemEpic,
+  calculateEpic,
 } from './shopping-cart/duck';
 
 import localValuesReducer, {
@@ -65,6 +66,7 @@ export const rootEpic = combineEpics(
   fetchShoppingCartEpic,
   addShoppingCartItemEpic,
   deleteShoppingCartItemEpic,
+  calculateEpic,
   // local-values
   fetchCategoriesEpic,
   // products

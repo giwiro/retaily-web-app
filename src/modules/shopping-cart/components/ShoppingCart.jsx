@@ -21,12 +21,15 @@ import TopBanner from '../../../elements/TopBanner/TopBanner';
 import {commaFormat} from '../../../utils/number';
 
 import type {
+  Pricing,
   ShoppingCart as ShoppingCartEntity,
   ShoppingCartItem,
 } from '../../../entities';
 import Typography from '@material-ui/core/Typography';
 
 type Props = {
+  pricing?: Pricing,
+  isCalculating?: boolean,
   shoppingCart?: ShoppingCartEntity,
   isFetching?: boolean,
   deleteShoppingCartItem: ({productId: number}) => void,
@@ -54,7 +57,13 @@ export const useStyles = makeStyles(theme => ({
 }));
 
 export default function ShoppingCart(props: Props) {
-  const {shoppingCart, isFetching, deleteShoppingCartItem} = props;
+  const {
+    shoppingCart,
+    isFetching,
+    deleteShoppingCartItem,
+    pricing,
+    isCalculating,
+  } = props;
   const classes = useStyles();
 
   const total =
@@ -68,7 +77,7 @@ export default function ShoppingCart(props: Props) {
   const rows =
     shoppingCart &&
     shoppingCart.items.map((item: ShoppingCartItem) => {
-      const subtotal = item.product.price * item.amount;
+      // const itemSubtotal = item.product.price * item.amount;
       return (
         <TableRow key={item.id}>
           <TableCell align="right">
@@ -83,9 +92,9 @@ export default function ShoppingCart(props: Props) {
             $ {commaFormat(item.product.price)}
           </TableCell>
           <TableCell align="right">{item.amount}</TableCell>
-          <TableCell align="right" className={classes.moneyCellRow}>
-            $ {commaFormat(subtotal)}
-          </TableCell>
+          {/*<TableCell align="right" className={classes.moneyCellRow}>
+            $ {commaFormat(itemSubtotal)}
+          </TableCell>*/}
           <TableCell align="right">
             <IconButton
               color="secondary"
@@ -121,7 +130,7 @@ export default function ShoppingCart(props: Props) {
                     <TableCell align="right">Product</TableCell>
                     <TableCell align="right">Price</TableCell>
                     <TableCell align="right">QTY</TableCell>
-                    <TableCell align="right">Amount</TableCell>
+                    {/*<TableCell align="right">Amount</TableCell>*/}
                     <TableCell align="right" />
                   </TableRow>
                 </TableHead>
@@ -133,12 +142,14 @@ export default function ShoppingCart(props: Props) {
                         {rows}
                         <TableRow>
                           <TableCell colSpan={2} />
-                          <TableCell align="right">Total</TableCell>
+                          <TableCell align="right">Subtotal</TableCell>
                           <TableCell
                             align="right"
                             className={classes.moneyCellRow}
                           >
-                            $ {commaFormat(total)}
+                            {pricing &&
+                              !isCalculating &&
+                              `$ ${commaFormat(pricing.subtotal)}`}
                           </TableCell>
                           <TableCell align="right" colSpan={2}>
                             <Button
@@ -208,6 +219,8 @@ export default function ShoppingCart(props: Props) {
 }
 
 ShoppingCart.propTypes = {
+  pricing: PropTypes.object,
+  isCalculating: PropTypes.bool,
   shoppingCart: PropTypes.object,
   isFetching: PropTypes.bool,
   deleteShoppingCartItem: PropTypes.func.isRequired,
