@@ -164,9 +164,7 @@ export default function SingleProductModal(props: Props) {
               </Select>
             </FormControl>*/}
         <FormControl variant="outlined" className={classes.amountFormControl}>
-          <InputLabel htmlFor="outlined-amount-native-simple">
-            Amount
-          </InputLabel>
+          <InputLabel htmlFor="outlined-amount-native-simple">Qnt.</InputLabel>
           <Select
             native
             value={amount}

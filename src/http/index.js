@@ -48,6 +48,7 @@ function httpCreatorFactory(
   switch (method) {
     case 'GET':
     case 'POST':
+    case 'PUT':
     case 'DELETE':
       return ajax({
         url,
@@ -69,6 +70,11 @@ export const postCreator = (route: string) => (
   body: {[key: string]: any},
   o?: RequestOptions
 ) => httpCreatorFactory('POST', route, {body, ...o});
+
+export const putCreator = (route: string) => (
+  body: {[key: string]: any},
+  o?: RequestOptions
+) => httpCreatorFactory('PUT', route, {body, ...o});
 
 export const deleteCreator = (route: string) => (
   body: {[key: string]: any},
