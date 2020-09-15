@@ -71,15 +71,21 @@ export const actions = {
   updateCartItem,
 };
 
-export const initialState = {};
+export const initialState = {
+  isFetching: true,
+};
 
 export default createReducer(initialState, {
-  [FetchShoppingCart.type]: () => ({isFetching: true}),
-  [FetchShoppingCartSuccess.type]: (_, action: ShoppingCartAction) => ({
-    shoppingCart: action.shoppingCart,
+  [FetchShoppingCart.type]: s => ({...s, isFetching: true}),
+  [FetchShoppingCartSuccess.type]: (s, a) => ({
+    ...s,
+    shoppingCart: a.shoppingCart,
+    isFetching: false,
   }),
-  [FetchShoppingCartErrorFn.type]: (_, action: ShoppingCartAction) => ({
-    fetchShoppingCartError: action.error,
+  [FetchShoppingCartErrorFn.type]: (s, a) => ({
+    ...s,
+    fetchShoppingCartError: a.error,
+    isFetching: false,
   }),
   [AddShoppingCartItem.type]: (state: ShoppingCartState) => ({
     ...state,

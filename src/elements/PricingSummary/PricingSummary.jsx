@@ -48,14 +48,18 @@ export default function PricingSummary(props: Props) {
                 {!!pricing &&
                   !isLoading &&
                   `$ ${commaFormat(pricing.subtotal)}`}
-                {(!pricing || isLoading) && <Skeleton variant="text" />}
+                {(!pricing || isLoading) && (
+                  <Skeleton variant="text" animation="wave" />
+                )}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell align="left">Tax:</TableCell>
               <TableCell align="right" className={classes.moneyCellRow}>
                 {!!pricing && !isLoading && `$ ${commaFormat(pricing.taxes)}`}
-                {(!pricing || isLoading) && <Skeleton variant="text" />}
+                {(!pricing || isLoading) && (
+                  <Skeleton variant="text" animation="wave" />
+                )}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -64,7 +68,9 @@ export default function PricingSummary(props: Props) {
                 {!!pricing &&
                   !isLoading &&
                   `$ ${commaFormat(pricing.paymentFee)}`}
-                {(!pricing || isLoading) && <Skeleton variant="text" />}
+                {(!pricing || isLoading) && (
+                  <Skeleton variant="text" animation="wave" />
+                )}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -73,7 +79,9 @@ export default function PricingSummary(props: Props) {
                 {!!pricing &&
                   !isLoading &&
                   `$ ${commaFormat(pricing.commission)}`}
-                {(!pricing || isLoading) && <Skeleton variant="text" />}
+                {(!pricing || isLoading) && (
+                  <Skeleton variant="text" animation="wave" />
+                )}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -82,7 +90,9 @@ export default function PricingSummary(props: Props) {
               </TableCell>
               <TableCell align="right" className={classes.guarantee}>
                 {!!pricing && !isLoading && <strong>Free</strong>}
-                {(!pricing || isLoading) && <Skeleton variant="text" />}
+                {(!pricing || isLoading) && (
+                  <Skeleton variant="text" animation="wave" />
+                )}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -92,7 +102,9 @@ export default function PricingSummary(props: Props) {
               <TableCell align="right" className={classes.lastCell}>
                 <strong className={classes.total}>
                   {!!pricing && !isLoading && `$ ${commaFormat(pricing.total)}`}
-                  {(!pricing || isLoading) && <Skeleton variant="text" />}
+                  {(!pricing || isLoading) && (
+                    <Skeleton variant="text" animation="wave" />
+                  )}
                 </strong>
               </TableCell>
             </TableRow>

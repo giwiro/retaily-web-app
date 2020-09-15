@@ -26,6 +26,7 @@ import type {
   Pricing,
   ShoppingCart as ShoppingCartEntity,
 } from '../../../entities';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 type Props = {
   pricing?: Pricing,
@@ -90,11 +91,13 @@ export const useStyles = makeStyles(theme => ({
   },
   itemImage: {
     width: 300,
+    height: 300,
     flex: '0 0 300px',
     backgroundSize: 'contain',
     margin: 'auto',
     [theme.breakpoints.up('md')]: {
       width: 250,
+      height: 250,
       flex: '0 0 250px',
       margin: 'unset',
     },
@@ -141,6 +144,51 @@ export default function ShoppingCart(props: Props) {
         {idx + 1}
       </option>
     ));
+
+  const loadingItems =
+    isFetching &&
+    Array(3)
+      .fill(null)
+      .map((_, idx: number) => (
+        <Grid item xs={12} lg={6}>
+          <Container>
+            <Card key={`skeleton-${idx}`} className={classes.itemCard}>
+              <div className={classes.itemWrap}>
+                <Skeleton
+                  animation="wave"
+                  variant="rect"
+                  className={classes.itemImage}
+                  width="100%"
+                />
+                <CardContent>
+                  <Skeleton
+                    animation="wave"
+                    variant="text"
+                    width="9 0%"
+                    height={64}
+                  />
+                  {/*shouldShowFewLeft() && (
+                  <Alert severity="warning" className={classes.warningWrap}>
+                    Only few in stock !
+                  </Alert>
+                )*/}
+                  <Skeleton animation="wave" variant="text" width={64} />
+                  <Skeleton
+                    animation="wave"
+                    variant="text"
+                    width={64}
+                    height={64}
+                    style={{marginTop: 12}}
+                  />
+                </CardContent>
+              </div>
+              <CardActions className={classes.itemActions}>
+                <Skeleton animation="wave" variant="text" width={64} />
+              </CardActions>
+            </Card>
+          </Container>
+        </Grid>
+      ));
 
   const items =
     !!shoppingCart &&
@@ -279,6 +327,7 @@ export default function ShoppingCart(props: Props) {
               className={classes.shoppingCartItemsWrap}
             >
               <Grid container justify="space-between">
+                {loadingItems}
                 {items}
               </Grid>
             </Grid>
@@ -305,7 +354,7 @@ export default function ShoppingCart(props: Props) {
                   startIcon={<CreditCardIcon />}
                   component={Link}
                   to="/shopping-cart/checkout"
-                  disabled={isCalculating}
+                  disabled={isCalculating || isFetching}
                 >
                   Checkout
                   {/*<strong className={classes.total}>{`$ ${commaFormat(
