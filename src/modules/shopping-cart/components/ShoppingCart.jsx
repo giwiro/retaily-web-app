@@ -1,24 +1,27 @@
 // @flow
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from '@material-ui/core/Button';
+import {
+  Button,
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  CardMedia,
+  CardActions,
+  Select,
+  InputLabel,
+  FormControl,
+  makeStyles,
+} from '@material-ui/core';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
 import {Link} from 'react-router-dom';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import {makeStyles} from '@material-ui/core/styles';
 import TopBanner from '../../../elements/TopBanner/TopBanner';
 import PricingSummary from '../../../elements/PricingSummary/PricingSummary';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardActions from '@material-ui/core/CardActions';
 import {commaFormat} from '../../../utils/number';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormControl from '@material-ui/core/FormControl';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 import sadFace from '../../../assets/img/sad-face.png';
 
@@ -26,7 +29,6 @@ import type {
   Pricing,
   ShoppingCart as ShoppingCartEntity,
 } from '../../../entities';
-import Skeleton from '@material-ui/lab/Skeleton';
 
 type Props = {
   pricing?: Pricing,
@@ -233,10 +235,6 @@ export default function ShoppingCart(props: Props) {
                     value={i.amount}
                     onChange={event => {
                       if (event.target instanceof HTMLSelectElement) {
-                        console.log({
-                          productId: i.product.id,
-                          amount: event.target.value,
-                        });
                         updateCartItem({
                           productId: i.product.id,
                           amount: event.target.value,
@@ -271,7 +269,7 @@ export default function ShoppingCart(props: Props) {
 
   return (
     <Grid container className={classes.mainWrap}>
-      <TopBanner />
+      <TopBanner title="Shopping cart" />
 
       {/* No items */}
       {!!shoppingCart && !shoppingCart.items.length && (

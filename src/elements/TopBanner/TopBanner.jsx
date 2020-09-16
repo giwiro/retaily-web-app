@@ -1,10 +1,15 @@
 // @flow
+import React from 'react';
+import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import React from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 
 import background from '../../assets/img/background.png';
+
+type Props = {|
+  title: string,
+|};
 
 export const useStyles = makeStyles(theme => ({
   topWrap: {
@@ -26,14 +31,19 @@ export const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function TopBanner() {
+export default function TopBanner(props: Props) {
+  const {title} = props;
   const classes = useStyles();
 
   return (
     <Grid container xs={12} item className={classes.topWrap}>
       <Typography component="h1" variant="h4" className={classes.title}>
-        Shopping Cart
+        {title}
       </Typography>
     </Grid>
   );
 }
+
+TopBanner.propTypes = {
+  title: PropTypes.string.isRequired,
+};

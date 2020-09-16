@@ -1,9 +1,7 @@
 // @flow
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import {makeStyles} from '@material-ui/core/styles';
-import Modal from '@material-ui/core/Modal';
+import {CircularProgress, Modal, makeStyles} from '@material-ui/core';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 

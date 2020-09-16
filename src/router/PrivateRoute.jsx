@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import {Redirect, Route} from 'react-router-dom';
 
 import type {User} from '../entities';
+import {connect} from 'react-redux';
+import type {RootState} from '../modules';
 
 type Props = {|
   component: any,
@@ -13,7 +15,7 @@ type Props = {|
   exact: boolean,
 |};
 
-export const PrivateRoute = ({
+const _PrivateRoute = ({
   component: Component,
   componentProps,
   user,
@@ -40,7 +42,12 @@ export const PrivateRoute = ({
   />
 );
 
-PrivateRoute.propTypes = {
+export const PrivateRoute = connect((state: RootState) => ({
+  user: state.auth.user,
+  initialAuthDone: state.auth.initialAuthDone,
+}))(_PrivateRoute);
+
+_PrivateRoute.propTypes = {
   component: PropTypes.any.isRequired,
   componentProps: PropTypes.object,
   user: PropTypes.object,

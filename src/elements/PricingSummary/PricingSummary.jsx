@@ -1,14 +1,16 @@
 // @flow
 import React from 'react';
 import PropTypes from 'prop-types';
-import CardContent from '@material-ui/core/CardContent';
-import Card from '@material-ui/core/Card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
-import CardHeader from '@material-ui/core/CardHeader';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
 import Skeleton from '@material-ui/lab/Skeleton';
 import {commaFormat} from '../../utils/number';
 

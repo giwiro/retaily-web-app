@@ -10,11 +10,12 @@ import {actions as LocalValuesActions} from './modules/local-values/duck';
 import {PrivateRoute} from './router/PrivateRoute';
 import {usePrevious} from './utils/react';
 import {createMuiTheme} from '@material-ui/core';
-import {ThemeProvider} from '@material-ui/styles';
+import {ThemeProvider} from '@material-ui/core/styles';
 import HomeContainer from './modules/home/containers/HomeContainer';
 import AuthModalContainer from './modules/auth/containers/AuthModalContainer';
 import NavbarContainer from './modules/navbar/containers/NavbarContainer';
 import ShoppingCartContainer from './modules/shopping-cart/containers/ShoppingCartContainer';
+import CheckoutContainer from './modules/checkout/containers/CheckoutContainer';
 import ProductsContainer from './modules/products/containers/ProductsContainer';
 
 import type {User} from './entities';
@@ -33,24 +34,17 @@ const theme = createMuiTheme({
 
 type Props = {|
   user?: User,
-  initialAuthDone?: boolean,
   isAuthenticating?: boolean,
   authResetState: () => void,
   fetchCategories: () => void,
 |};
 
-type State = {|
+/*type State = {|
   authModalOpen: boolean,
-|};
+|};*/
 
-function App(props: Props, state: State) {
-  const {
-    user,
-    isAuthenticating,
-    authResetState,
-    initialAuthDone,
-    fetchCategories,
-  } = props;
+function App(props: Props) {
+  const {user, isAuthenticating, authResetState, fetchCategories} = props;
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const prevUser = usePrevious(user);
@@ -93,10 +87,14 @@ function App(props: Props, state: State) {
           />
         </Route>
         <PrivateRoute
+          path="/shopping-cart"
           exact
           component={ShoppingCartContainer}
-          user={user}
-          initialAuthDone={initialAuthDone}
+        />
+        <PrivateRoute
+          path="/shopping-cart/checkout"
+          exact
+          component={CheckoutContainer}
         />
       </Switch>
     </ThemeProvider>
@@ -114,7 +112,6 @@ App.propTypes = {
 export default connect(
   (state: RootState) => ({
     user: state.auth.user,
-    initialAuthDone: state.auth.initialAuthDone,
     isAuthenticating: state.auth.isAuthenticating,
   }),
   (dispatch: Dispatch<any>) =>
