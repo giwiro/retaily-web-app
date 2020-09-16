@@ -15,7 +15,6 @@ import {
   FormControl,
   makeStyles,
 } from '@material-ui/core';
-import CreditCardIcon from '@material-ui/icons/CreditCard';
 import {Link} from 'react-router-dom';
 import TopBanner from '../../../elements/TopBanner/TopBanner';
 import PricingSummary from '../../../elements/PricingSummary/PricingSummary';
@@ -152,9 +151,9 @@ export default function ShoppingCart(props: Props) {
     Array(3)
       .fill(null)
       .map((_, idx: number) => (
-        <Grid item xs={12} lg={6}>
+        <Grid key={`skeleton-${idx}`} item xs={12} lg={6}>
           <Container>
-            <Card key={`skeleton-${idx}`} className={classes.itemCard}>
+            <Card className={classes.itemCard}>
               <div className={classes.itemWrap}>
                 <Skeleton
                   animation="wave"
@@ -196,9 +195,9 @@ export default function ShoppingCart(props: Props) {
     !!shoppingCart &&
     shoppingCart.items.length > 0 &&
     shoppingCart.items.map(i => (
-      <Grid item xs={12} lg={6}>
+      <Grid key={i.id} item xs={12} lg={6}>
         <Container>
-          <Card key={i.id} className={classes.itemCard}>
+          <Card className={classes.itemCard}>
             <div className={classes.itemWrap}>
               <CardMedia
                 className={classes.itemImage}
@@ -349,7 +348,7 @@ export default function ShoppingCart(props: Props) {
                   color="primary"
                   size="large"
                   className={classes.submit}
-                  startIcon={<CreditCardIcon />}
+                  //  startIcon={<CreditCardIcon />}
                   component={Link}
                   to="/shopping-cart/checkout"
                   disabled={isCalculating || isFetching}

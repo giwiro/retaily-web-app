@@ -1,13 +1,13 @@
 // @flow
 import type {Product} from './product';
 
-export type ShoppingCartItem = {
+export type ShoppingCartItem = {|
   id: number,
   shoppingCartItemStatus: string,
   product: Product,
   amount: number,
-};
+|};
 
-export type ShoppingCart = {
+export type ShoppingCart = {|
   items: ShoppingCartItem[],
-};
+|};
