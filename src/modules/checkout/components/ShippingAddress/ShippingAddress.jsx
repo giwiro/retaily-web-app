@@ -16,10 +16,11 @@ import {useFormContext} from 'react-hook-form';
 type Props = {|
   title: string,
   idPrefix: string,
+  disabled?: boolean,
 |};
 
 export default function ShippingAddress(props: Props) {
-  const {title, idPrefix} = props;
+  const {title, idPrefix, disabled} = props;
   const {register, errors} = useFormContext();
 
   return (
@@ -46,6 +47,7 @@ export default function ShippingAddress(props: Props) {
               inputRef={register({
                 required: 'Required',
               })}
+              disabled={disabled}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -67,6 +69,7 @@ export default function ShippingAddress(props: Props) {
               inputRef={register({
                 required: 'Required',
               })}
+              disabled={disabled}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -88,6 +91,7 @@ export default function ShippingAddress(props: Props) {
               inputRef={register({
                 required: 'Required',
               })}
+              disabled={disabled}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -106,9 +110,8 @@ export default function ShippingAddress(props: Props) {
                   ? errors[`${idPrefix}-address-2`].message
                   : ''
               }
-              inputRef={register({
-                required: 'Required',
-              })}
+              inputRef={register()}
+              disabled={disabled}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -130,6 +133,7 @@ export default function ShippingAddress(props: Props) {
               inputRef={register({
                 required: 'Required',
               })}
+              disabled={disabled}
             />
           </Grid>
           <Grid item xs={6} sm={3}>
@@ -145,6 +149,7 @@ export default function ShippingAddress(props: Props) {
                     required: 'Required',
                   }),
                 }}
+                disabled={disabled}
               >
                 <option value="AL">AL</option>
                 <option value="AK">AK</option>
@@ -219,6 +224,7 @@ export default function ShippingAddress(props: Props) {
               inputRef={register({
                 required: 'Required',
               })}
+              disabled={disabled}
             />
           </Grid>
         </Grid>
@@ -230,4 +236,5 @@ export default function ShippingAddress(props: Props) {
 ShippingAddress.propTypes = {
   title: PropTypes.string.isRequired,
   idPrefix: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
 };

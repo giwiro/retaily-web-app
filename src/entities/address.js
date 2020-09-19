@@ -1,5 +1,6 @@
 // @flow
 export type Address = {|
+  type: 'address',
   firstName: string,
   lastName: string,
   address1: string,
