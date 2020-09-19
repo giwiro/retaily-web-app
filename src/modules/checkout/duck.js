@@ -27,6 +27,7 @@ export const createOrder = g('checkout/create-order');
 export const createOrderSuccess = g('checkout/create-order-success');
 export const createOrderErrorFn = g('checkout/create-order-error');
 export const checkoutResetState = g('checkout/reset-state');
+export const checkoutRequest = g('checkout/checkout-request');
 export const checkoutFinishLoading = g('checkout/finish-loading');
 export const checkoutErrorFn = g('checkout/checkout-error');
 
@@ -36,14 +37,26 @@ export const actions = {
   checkoutFinishLoading,
   checkoutErrorFn,
   createOrderErrorFn,
+  checkoutRequest,
 };
 
 export const initialState = {};
 
 export default createReducer<CheckoutState, CheckoutAction>(initialState, {
   [createOrder]: _ => ({isCreating: true, isCheckingOut: true}),
-  [createOrderSuccess]: (s, {order}) => ({...s, order}),
-  [createOrderErrorFn]: (s, {error}) => ({...s, createOrderError: error}),
+  [createOrderSuccess]: (s, {order}) => ({...s, order, isCreating: false}),
+  [createOrderErrorFn]: (s, {error}) => ({
+    ...s,
+    createOrderError: error,
+    isCreating: false,
+    isCheckingOut: false,
+  }),
+  [checkoutRequest]: s => ({
+    ...s,
+    isCheckingOut: true,
+    createOrderError: undefined,
+    checkoutError: undefined,
+  }),
   [checkoutFinishLoading]: s => ({...s, isCheckingOut: false}),
   [checkoutErrorFn]: (s, {error}) => ({...s, checkoutError: error}),
   [checkoutResetState]: _ => initialState,

@@ -2,7 +2,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import {Subject} from 'rxjs';
-import {useHistory} from 'react-router-dom';
+import {Redirect, useHistory} from 'react-router-dom';
 import {
   makeStyles,
   FormControlLabel,
@@ -29,11 +29,12 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 
-import type {Address, Order, Pricing} from '../../../entities';
+import type {Address, Order, Pricing, ShoppingCart} from '../../../entities';
 import Alert from '@material-ui/lab/Alert';
 
 type Props = {
   pricing?: Pricing,
+  shoppingCart?: ShoppingCart,
   order?: Order,
   isFetching?: boolean,
   isCalculating?: boolean,
@@ -43,6 +44,8 @@ type Props = {
   isCheckingOut?: boolean,
   createOrderErrorFn: ({error: string}) => void,
   checkoutError?: string,
+  createOrderError?: string,
+  checkoutRequest: () => void,
 };
 
 export const useStyles = makeStyles(theme => ({
@@ -83,6 +86,8 @@ function CheckoutInner(props: Props) {
     isCheckingOut,
     checkoutErrorFn,
     checkoutError,
+    createOrderError,
+    checkoutRequest,
   } = props;
 
   const classes = useStyles();
@@ -121,31 +126,43 @@ function CheckoutInner(props: Props) {
     history,
   ]);
 
+  // Disable Stripe
+  useEffect(() => {
+    if (elements) {
+      const card = elements.getElement(CardElement);
+      if (isCheckingOut) card.update({disabled: true});
+      else card.update({disabled: false});
+    }
+  }, [elements, isCheckingOut]);
+
+  // If is the first time the order is generated, then execute the confirm stripe payment
   useEffect(() => {
     if (!prevOrder && order) {
       confirmStripePayment();
     }
   }, [order, prevOrder, confirmStripePayment]);
 
+  // If the payment went wrong, there is a change to retry
   useEffect(() => {
     const subs = retryPayment$.subscribe(_ => {
+      checkoutRequest();
       confirmStripePayment();
     });
     return () => subs.unsubscribe();
-  }, [confirmStripePayment]);
+  }, [checkoutRequest, confirmStripePayment]);
 
+  // Ehen exit the view, then reset all checkout state
   useEffect(() => {
     return () => checkoutResetState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkoutResetState]);
 
   const handleChangeSameBilling = event => {
-    if (!order) {
-      setSameBilling(event.target.checked);
-    } else retryPayment$.next();
+    setSameBilling(event.target.checked);
   };
 
   const handleSubmit = async values => {
+    if (order) return retryPayment$.next();
     const shippingAddress = mapToAddress(values, 'shipping-address');
     const billingAddress = mapToAddress(values, 'billing-address');
 
@@ -207,9 +224,11 @@ function CheckoutInner(props: Props) {
               <Card>
                 <CardHeader title="Payment" />
                 <CardContent>
-                  {checkoutError && (
+                  {(checkoutError || createOrderError) && (
                     <>
-                      <Alert severity="error">{checkoutError}</Alert>
+                      <Alert severity="error">
+                        {checkoutError || createOrderError}
+                      </Alert>
                       <br />
                       <br />
                     </>
@@ -262,15 +281,22 @@ function CheckoutInner(props: Props) {
 }
 
 export default function Checkout(props: Props) {
+  const {shoppingCart} = props;
   return (
-    <Elements stripe={stripePromise}>
-      <CheckoutInner {...props} />
-    </Elements>
+    <>
+      {!!shoppingCart && shoppingCart.items.length === 0 && (
+        <Redirect to="/shopping-cart" />
+      )}
+      <Elements stripe={stripePromise}>
+        <CheckoutInner {...props} />
+      </Elements>
+    </>
   );
 }
 
 Checkout.propTypes = CheckoutInner.propTypes = {
   pricing: PropTypes.object,
+  shoppingCart: PropTypes.object,
   order: PropTypes.object,
   isFetching: PropTypes.bool,
   isCalculating: PropTypes.bool,
@@ -280,4 +306,6 @@ Checkout.propTypes = CheckoutInner.propTypes = {
   isCheckingOut: PropTypes.bool,
   checkoutErrorFn: PropTypes.func.isRequired,
   checkoutError: PropTypes.string,
+  createOrderError: PropTypes.string,
+  checkoutRequest: PropTypes.func.isRequired,
 };
