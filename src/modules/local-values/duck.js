@@ -1,7 +1,8 @@
-import {ActionCreator, buildCatchError, createReducer} from '../../store/utils';
+// @flow
 import {ofType} from 'redux-observable';
 import {map, switchMap} from 'rxjs/operators';
-import {getCategories} from './api';
+import {createReducer, eCatchError, g} from '../../store/utils';
+import {getCategoriesApi} from './api';
 
 import type {Action} from '../../store/utils';
 import type {ProductCategory} from '../../entities';
@@ -18,36 +19,33 @@ export type LocalValuesState = {
   fetchCategoriesError?: string,
 };
 
-export class FetchCategories extends ActionCreator<LocalValuesAction> {}
-export class FetchCategoriesSuccess extends ActionCreator<LocalValuesAction> {}
-export class FetchCategoriesErrorFn extends ActionCreator<LocalValuesAction> {}
+export const fetchCategories = g('local-values/fetch-categories');
+export const fetchCategoriesSuccess = g(
+  'local-values/fetch-categories-success'
+);
+export const fetchCategoriesErrorFn = g('local-values/fetch-categories-error');
 
 export const actions = {
-  fetchCategories: (payload: LocalValuesAction) => new FetchCategories(payload),
+  fetchCategories,
 };
 
 export const initialState = {};
 
 export default createReducer(initialState, {
-  [FetchCategories.type]: () => ({isFetchingCategories: true}),
-  [FetchCategoriesSuccess.type]: (_, action: LocalValuesAction) => ({
-    categories: action.categories,
-  }),
-  [FetchCategoriesErrorFn.type]: (_, action: LocalValuesAction) => ({
-    fetchCategoriesError: action.error,
-  }),
+  [fetchCategories]: () => ({isFetchingCategories: true}),
+  [fetchCategoriesSuccess]: (_, {categories}) => ({categories}),
+  [fetchCategoriesErrorFn]: (_, {error}) => ({fetchCategoriesError: error}),
 });
 
 export function fetchCategoriesEpic(action$: ActionsObservable) {
   return action$.pipe(
-    ofType(FetchCategories.type),
+    ofType(fetchCategories),
     switchMap(() =>
-      getCategories().pipe(
-        map(
-          (categories: ProductCategory[]) =>
-            new FetchCategoriesSuccess({categories})
+      getCategoriesApi().pipe(
+        map((categories: ProductCategory[]) =>
+          fetchCategoriesSuccess({categories})
         ),
-        buildCatchError(FetchCategoriesErrorFn)
+        eCatchError(fetchCategoriesErrorFn)
       )
     )
   );

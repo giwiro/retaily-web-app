@@ -1,7 +1,7 @@
 // @flow
 import {ofType} from 'redux-observable';
 import {debounceTime, map, switchMap} from 'rxjs/operators';
-import {ActionCreator, buildCatchError, createReducer} from '../../store/utils';
+import {eCatchError, createReducer, g} from '../../store/utils';
 import {getProductsApi} from './api';
 
 import type {ActionsObservable} from 'redux-observable';
@@ -21,12 +21,12 @@ export type ProductsState = Action & {
   fetchProductsError?: string,
 };
 
-export class FetchProducts extends ActionCreator<ProductsAction> {}
-export class FetchProductsSuccess extends ActionCreator<ProductsAction> {}
-export class FetchProductsErrorFn extends ActionCreator<ProductsAction> {}
+export const fetchProducts = g<ProductsAction>('products/fetch');
+export const fetchProductsSuccess = g<ProductsAction>('products/success');
+export const fetchProductsErrorFn = g<ProductsAction>('products/error');
 
 export const actions = {
-  fetchProducts: (payload: ProductsAction) => new FetchProducts(payload),
+  fetchProducts,
 };
 
 export const initialState = {
@@ -34,45 +34,41 @@ export const initialState = {
 };
 
 export default createReducer(initialState, {
-  [FetchProducts.type]: (state: ProductsState, action: ProductsAction) => ({
-    products: action.resetPagination ? undefined : state.products,
+  [fetchProducts]: ({products}, {resetPagination}) => ({
+    products: resetPagination ? undefined : products,
     isFetching: true,
     fetchProductsError: undefined,
   }),
-  [FetchProductsSuccess.type]: (
-    state: ProductsState,
-    action: ProductsAction
+  [fetchProductsSuccess]: (
+    {products: productsState},
+    {resetPagination, products}
   ) => ({
-    products: action.resetPagination
-      ? [...action.products]
-      : [...(state.products || []), ...action.products],
+    products: resetPagination
+      ? [...products]
+      : [...(productsState || []), ...products],
     isFetching: false,
     fetchProductsError: undefined,
   }),
-  [FetchProductsErrorFn.type]: (
-    state: ProductsState,
-    action: ProductsAction
-  ) => ({
-    ...state,
+  [fetchProductsErrorFn]: (s, {error}) => ({
+    ...s,
     isFetching: false,
-    fetchProductsError: action.error,
+    fetchProductsError: error,
   }),
 });
 
 export function fetchProductsEpic(action$: ActionsObservable) {
   return action$.pipe(
-    ofType(FetchProducts.type),
+    ofType(fetchProducts),
     debounceTime(500),
     switchMap((action: ProductsAction) =>
       getProductsApi(action.filters).pipe(
-        map(
-          (products: Product[]) =>
-            new FetchProductsSuccess({
-              products,
-              resetPagination: action.resetPagination,
-            })
+        map((products: Product[]) =>
+          fetchProductsSuccess({
+            products,
+            resetPagination: action.resetPagination,
+          })
         ),
-        buildCatchError(FetchProductsErrorFn)
+        eCatchError(fetchProductsErrorFn)
       )
     )
   );

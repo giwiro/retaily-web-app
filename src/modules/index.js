@@ -8,6 +8,7 @@ import type {ShoppingCartState} from './shopping-cart/duck';
 import type {LocalValuesState} from './local-values/duck';
 import type {ProductsState} from './products/duck';
 import type {CheckoutState} from './checkout/duck';
+import type {OrderState} from './order/duck';
 
 import authReducer, {
   initialState as AuthInitialState,
@@ -42,12 +43,18 @@ import checkoutReducer, {
   createOrderEpic,
 } from './checkout/duck';
 
+import orderReducer, {
+  initialState as OrderInitialState,
+  fetchOrderEpic,
+} from './order/duck';
+
 export type RootState = {
   auth: AuthState,
   shoppingCart: ShoppingCartState,
   localValues: LocalValuesState,
   products: ProductsState,
   checkout: CheckoutState,
+  order: OrderState,
 };
 
 export const defaultInitialState = {
@@ -56,6 +63,7 @@ export const defaultInitialState = {
   localValues: LocalValuesInitialState,
   products: ProductsInitialState,
   checkout: CheckoutInitialState,
+  order: OrderInitialState,
 };
 
 export const appReducer = combineReducers({
@@ -64,6 +72,7 @@ export const appReducer = combineReducers({
   localValues: localValuesReducer,
   products: productsReducer,
   checkout: checkoutReducer,
+  order: orderReducer,
 });
 
 export const rootEpic = combineEpics(
@@ -83,7 +92,9 @@ export const rootEpic = combineEpics(
   // products
   fetchProductsEpic,
   // checkout
-  createOrderEpic
+  createOrderEpic,
+  // order
+  fetchOrderEpic
 );
 
 export const rootReducer = (state: RootState, action: Action) => {

@@ -192,7 +192,7 @@ export default function ProductsFilter(props: Props) {
 
   const priceSection = (
     <FilterSection>
-      <FilterTitle>Price</FilterTitle>
+      <FilterTitle>Max price</FilterTitle>
       <Grid
         container
         item

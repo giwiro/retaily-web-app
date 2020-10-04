@@ -2,6 +2,7 @@
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {actions as CheckoutActions} from '../duck';
+import {actions as ShoppingCartActions} from '../../shopping-cart/duck';
 import Checkout from '../components/Checkout';
 
 import type {Dispatch} from 'redux';
@@ -21,6 +22,7 @@ export default connect(
     bindActionCreators(
       {
         ...CheckoutActions,
+        ...ShoppingCartActions,
       },
       dispatch
     )

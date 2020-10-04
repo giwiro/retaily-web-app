@@ -44,24 +44,6 @@ export function generateAction<T>(type: string) {
 
 export const g = generateAction;
 
-/*export function generateActions<T>(actions: {[key: string]: string}) {
-  const _actions = {...actions};
-  Object.keys(_actions).forEach(
-    (action: string) => (_actions[action] = generateAction<T>(_actions[action]))
-  );
-  return _actions;
-}*/
-
-/*export function generateActionCreators<T>(
-  classes: Class<ActionCreator<T>>[]
-): {[key: string]: () => void} {
-  const r = {};
-  classes.forEach(
-    (cls: Class<ActionCreator<T>>) => (r[(cls: any).fnName] = aa => new cls(aa))
-  );
-  return r;
-}*/
-
 export const createReducer = <S, A>(
   initialState: S,
   reducerMap: ReducerMap<S, A>,

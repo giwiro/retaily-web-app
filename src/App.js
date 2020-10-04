@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Redirect, Route, Switch} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
-import type {Dispatch} from 'redux';
 import {actions as AuthActions} from './modules/auth/duck';
 import {actions as LocalValuesActions} from './modules/local-values/duck';
 import {PrivateRoute} from './router/PrivateRoute';
@@ -17,9 +16,11 @@ import NavbarContainer from './modules/navbar/containers/NavbarContainer';
 import ShoppingCartContainer from './modules/shopping-cart/containers/ShoppingCartContainer';
 import CheckoutContainer from './modules/checkout/containers/CheckoutContainer';
 import ProductsContainer from './modules/products/containers/ProductsContainer';
+import OrderContainer from './modules/order/containers/OrderContainer';
 
 import type {User} from './entities';
 import type {RootState} from './modules';
+import type {Dispatch} from 'redux';
 
 import blue from '@material-ui/core/colors/blue';
 
@@ -96,6 +97,7 @@ function App(props: Props) {
           exact
           component={CheckoutContainer}
         />
+        <PrivateRoute path="/order/:orderId" exact component={OrderContainer} />
       </Switch>
     </ThemeProvider>
   );

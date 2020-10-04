@@ -1,12 +1,14 @@
 // @flow
 import {ofType} from 'redux-observable';
-import {map, switchMap} from 'rxjs/operators';
+import {catchError, map, switchMap} from 'rxjs/operators';
+import {of} from 'rxjs';
 import {createReducer, eCatchError, g} from '../../store/utils';
 import {getSessionApi, loginApi, logoutApi, registerApi} from './api';
 
 import type {User} from '../../entities';
 import type {Action} from '../../store/utils';
 import type {ActionsObservable} from 'redux-observable';
+import type {AjaxError} from 'rxjs/ajax';
 
 export type AuthAction = Action & {
   email?: string,
@@ -48,39 +50,25 @@ export const initialState = {};
 
 export default createReducer<AuthState, AuthAction>(initialState, {
   [getSession]: () => ({isAuthenticating: true}),
-  [getSessionSuccess]: (_, action: AuthAction) => ({
-    user: action.user,
-    initialAuthDone: true,
-  }),
+  [getSessionSuccess]: (_, {user}) => ({user, initialAuthDone: true}),
   [getSessionErrorFn]: () => ({initialAuthDone: true}),
-  [login]: (state: AuthState) => ({...state, isAuthenticating: true}),
-  [loginSuccess]: (state: AuthState, action: AuthAction) => ({
-    ...state,
-    user: action.user,
+  [login]: s => ({...s, isAuthenticating: true}),
+  [loginSuccess]: (s, {user}) => ({...s, user, isAuthenticating: false}),
+  [loginErrorFn]: (s, {error}) => ({
+    ...s,
+    loginError: error,
     isAuthenticating: false,
   }),
-  [loginErrorFn]: (state: AuthState, action: AuthAction) => ({
-    ...state,
-    loginError: action.error,
-    isAuthenticating: false,
-  }),
-  [register]: (state: AuthState) => ({
-    ...state,
-    isAuthenticating: true,
-  }),
-  [registerSuccess]: (state: AuthState, action: AuthAction) => ({
-    ...state,
-    user: action.user,
-    isAuthenticating: false,
-  }),
-  [registerErrorFn]: (state: AuthState, action: AuthAction) => ({
-    ...state,
-    registerError: action.error,
+  [register]: s => ({...s, isAuthenticating: true}),
+  [registerSuccess]: (s, {user}) => ({...s, user, isAuthenticating: false}),
+  [registerErrorFn]: (s, {error}) => ({
+    ...s,
+    registerError: error,
     isAuthenticating: false,
   }),
   [logout]: () => ({...initialState, initialAuthDone: true}),
   [authResetState]: () => initialState,
-  [noop]: (state: AuthState) => state,
+  [noop]: s => s,
 });
 
 export function getSessionEpic(action$: ActionsObservable) {
@@ -104,7 +92,11 @@ export function loginEpic(action$: ActionsObservable) {
         password: action.password,
       }).pipe(
         map((user: User) => loginSuccess({user})),
-        eCatchError(loginErrorFn)
+        catchError((error: AjaxError) => {
+          if (error.status === 401)
+            return of(loginErrorFn({error: 'Wrong credentials'}));
+          return of(loginErrorFn({error: 'Internal error'}));
+        })
       )
     )
   );

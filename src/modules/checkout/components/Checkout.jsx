@@ -20,6 +20,7 @@ import {useForm, FormContext} from 'react-hook-form';
 import ShippingAddress from './ShippingAddress/ShippingAddress';
 import {mapToAddress} from './ShippingAddress/utils';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
+import Alert from '@material-ui/lab/Alert';
 import {usePrevious} from '../../../utils/react';
 import {loadStripe} from '@stripe/stripe-js';
 import {
@@ -30,7 +31,6 @@ import {
 } from '@stripe/react-stripe-js';
 
 import type {Address, Order, Pricing, ShoppingCart} from '../../../entities';
-import Alert from '@material-ui/lab/Alert';
 
 type Props = {
   pricing?: Pricing,
@@ -46,6 +46,7 @@ type Props = {
   checkoutError?: string,
   createOrderError?: string,
   checkoutRequest: () => void,
+  fetchShoppingCart: () => void,
 };
 
 export const useStyles = makeStyles(theme => ({
@@ -88,6 +89,7 @@ function CheckoutInner(props: Props) {
     checkoutError,
     createOrderError,
     checkoutRequest,
+    fetchShoppingCart,
   } = props;
 
   const classes = useStyles();
@@ -107,13 +109,12 @@ function CheckoutInner(props: Props) {
           payment_method: {card: elements.getElement(CardElement)},
         })
         .then(result => {
-          console.log('result', result);
           if (result.error) {
             checkoutFinishLoading();
             checkoutErrorFn({error: result.error.message});
           } else {
-            console.log('redirect');
             history.push(`/order/${order.id}`);
+            fetchShoppingCart();
           }
         });
     }
@@ -124,6 +125,7 @@ function CheckoutInner(props: Props) {
     checkoutFinishLoading,
     checkoutErrorFn,
     history,
+    fetchShoppingCart,
   ]);
 
   // Disable Stripe
@@ -151,7 +153,7 @@ function CheckoutInner(props: Props) {
     return () => subs.unsubscribe();
   }, [checkoutRequest, confirmStripePayment]);
 
-  // Ehen exit the view, then reset all checkout state
+  // Then exit the view, then reset all checkout state
   useEffect(() => {
     return () => checkoutResetState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -308,4 +310,5 @@ Checkout.propTypes = CheckoutInner.propTypes = {
   checkoutError: PropTypes.string,
   createOrderError: PropTypes.string,
   checkoutRequest: PropTypes.func.isRequired,
+  fetchShoppingCart: PropTypes.func.isRequired,
 };

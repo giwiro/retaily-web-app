@@ -1,21 +1,16 @@
 // @flow
 import {ofType} from 'redux-observable';
 import {map, switchMap} from 'rxjs/operators';
-import {
-  ActionCreator,
-  buildCatchError,
-  createReducer,
-  eCatchError,
-  g,
-} from '../../store/utils';
-import {getSessionSuccess, loginSuccess} from '../auth/duck';
+import {createReducer, eCatchError, g} from '../../store/utils';
+import {getSessionSuccess, loginSuccess, registerSuccess} from '../auth/duck';
+import {createOrderSuccess} from '../checkout/duck';
 import {
   addShoppingCartItemApi,
   calculateApi,
   deleteShoppingCartItemApi,
   endpoints,
-  getShoppingCartApi,
   updateShoppingCartItemApi,
+  getShoppingCartApi,
 } from './api';
 
 import type {ActionsObservable} from 'redux-observable';
@@ -44,15 +39,25 @@ export type ShoppingCartState = {
   updateItemError?: boolean,
 };
 
-export class FetchShoppingCart extends ActionCreator<ShoppingCartAction> {}
-export class FetchShoppingCartSuccess extends ActionCreator<ShoppingCartAction> {}
-export class FetchShoppingCartErrorFn extends ActionCreator<ShoppingCartAction> {}
-export class AddShoppingCartItem extends ActionCreator<ShoppingCartAction> {}
-export class AddShoppingCartItemSuccess extends ActionCreator<ShoppingCartAction> {}
-export class AddShoppingCartItemErrorFn extends ActionCreator<ShoppingCartAction> {}
-export class DeleteShoppingCartItem extends ActionCreator<ShoppingCartAction> {}
-export class DeleteShoppingCartItemSuccess extends ActionCreator<ShoppingCartAction> {}
-export class DeleteShoppingCartItemErrorFn extends ActionCreator<ShoppingCartAction> {}
+export const fetchShoppingCart = g('shopping-cart/fetch-cart');
+export const fetchShoppingCartSuccess = g('shopping-cart/fetch-cart-success');
+export const fetchShoppingCartErrorFn = g('shopping-cart/fetch-cart-error');
+
+export const addShoppingCartItem = g('shopping-cart/add-cart-item');
+export const addShoppingCartItemSuccess = g(
+  'shopping-cart/add-cart-item-success'
+);
+export const addShoppingCartItemErrorFn = g(
+  'shopping-cart/add-cart-item-error'
+);
+
+export const deleteShoppingCartItem = g('shopping-cart/delete-cart-item');
+export const deleteShoppingCartItemSuccess = g(
+  'shopping-cart/delete-cart-item-success'
+);
+export const deleteShoppingCartItemErrorFn = g(
+  'shopping-cart/delete-cart-item-error'
+);
 
 export const updateCartItem = g('shopping-cart/update-item');
 export const updateCartItemSuccess = g('shopping-cart/update-item-success');
@@ -63,10 +68,9 @@ export const calculateSuccess = g('shopping-cart/calculate-success');
 export const calculateErrorFn = g('shopping-cart/calculate-error');
 
 export const actions = {
-  deleteShoppingCartItem: (payload: ShoppingCartAction) =>
-    new DeleteShoppingCartItem(payload),
-  addShoppingCartItem: (payload: ShoppingCartAction) =>
-    new AddShoppingCartItem(payload),
+  fetchShoppingCart,
+  deleteShoppingCartItem,
+  addShoppingCartItem,
   calculate,
   updateCartItem,
 };
@@ -76,60 +80,48 @@ export const initialState = {
 };
 
 export default createReducer(initialState, {
-  [FetchShoppingCart.type]: s => ({...s, isFetching: true}),
-  [FetchShoppingCartSuccess.type]: (s, a) => ({
+  [fetchShoppingCart]: s => ({...s, isFetching: true}),
+  [fetchShoppingCartSuccess]: (s, {shoppingCart}) => ({
     ...s,
-    shoppingCart: a.shoppingCart,
+    shoppingCart,
     isFetching: false,
   }),
-  [FetchShoppingCartErrorFn.type]: (s, a) => ({
+  [fetchShoppingCartErrorFn]: (s, {error}) => ({
     ...s,
-    fetchShoppingCartError: a.error,
+    fetchShoppingCartError: error,
     isFetching: false,
   }),
-  [AddShoppingCartItem.type]: (state: ShoppingCartState) => ({
-    ...state,
+  [addShoppingCartItem]: s => ({
+    ...s,
     isAddingItem: true,
     addItemError: undefined,
   }),
-  [AddShoppingCartItemSuccess.type]: (
-    state: ShoppingCartState,
-    action: ShoppingCartAction
-  ) => ({
-    ...state,
+  [addShoppingCartItemSuccess]: (s, {shoppingCart}) => ({
+    ...s,
     isAddingItem: false,
     addItemError: undefined,
-    shoppingCart: action.shoppingCart,
+    shoppingCart,
   }),
-  [AddShoppingCartItemErrorFn.type]: (
-    state: ShoppingCartState,
-    action: ShoppingCartAction
-  ) => ({
-    ...state,
+  [addShoppingCartItemErrorFn]: (s, {error}) => ({
+    ...s,
     isAddingItem: false,
-    addItemError: action.error,
+    addItemError: error,
   }),
-  [DeleteShoppingCartItem.type]: (state: ShoppingCartState) => ({
-    ...state,
+  [deleteShoppingCartItem]: s => ({
+    ...s,
     isDeletingItem: true,
     deleteItemError: undefined,
   }),
-  [DeleteShoppingCartItemSuccess.type]: (
-    state: ShoppingCartState,
-    action: ShoppingCartAction
-  ) => ({
-    ...state,
-    shoppingCart: action.shoppingCart,
+  [deleteShoppingCartItemSuccess]: (s, {shoppingCart}) => ({
+    ...s,
+    shoppingCart,
     isDeletingItem: false,
     deleteItemError: undefined,
   }),
-  [DeleteShoppingCartItemErrorFn.type]: (
-    state: ShoppingCartState,
-    action: ShoppingCartAction
-  ) => ({
-    ...state,
+  [deleteShoppingCartItemErrorFn]: (s, {error}) => ({
+    ...s,
     isDeletingItem: false,
-    deleteItemError: action.error,
+    deleteItemError: error,
   }),
   [calculate]: s => ({...s, isCalculating: true}),
   [calculateSuccess]: (s, {pricing}) => ({...s, isCalculating: false, pricing}),
@@ -141,14 +133,19 @@ export default createReducer(initialState, {
 
 export function fetchShoppingCartEpic(action$: ActionsObservable) {
   return action$.pipe(
-    ofType(FetchShoppingCart.type, getSessionSuccess.type, loginSuccess.type),
-    switchMap((action: ShoppingCartAction) =>
+    ofType(
+      fetchShoppingCart,
+      getSessionSuccess,
+      loginSuccess,
+      registerSuccess
+      // createOrderSuccess
+    ),
+    switchMap(_ =>
       getShoppingCartApi().pipe(
-        map(
-          (shoppingCart: ShoppingCart) =>
-            new FetchShoppingCartSuccess({shoppingCart})
+        map((shoppingCart: ShoppingCart) =>
+          fetchShoppingCartSuccess({shoppingCart})
         ),
-        buildCatchError(FetchShoppingCartErrorFn)
+        eCatchError(fetchShoppingCartErrorFn)
       )
     )
   );
@@ -156,7 +153,7 @@ export function fetchShoppingCartEpic(action$: ActionsObservable) {
 
 export function addShoppingCartItemEpic(action$: ActionsObservable) {
   return action$.pipe(
-    ofType(AddShoppingCartItem.type),
+    ofType(addShoppingCartItem),
     switchMap((action: ShoppingCartAction) =>
       addShoppingCartItemApi(
         {
@@ -169,11 +166,10 @@ export function addShoppingCartItemEpic(action$: ActionsObservable) {
           ),
         }
       ).pipe(
-        map(
-          (shoppingCart: ShoppingCart) =>
-            new AddShoppingCartItemSuccess({shoppingCart})
+        map((shoppingCart: ShoppingCart) =>
+          addShoppingCartItemSuccess({shoppingCart})
         ),
-        buildCatchError(AddShoppingCartItemErrorFn)
+        eCatchError(addShoppingCartItemErrorFn)
       )
     )
   );
@@ -205,7 +201,7 @@ export function updateShoppingCartItemEpic(action$: ActionsObservable) {
 
 export function deleteShoppingCartItemEpic(action$: ActionsObservable) {
   return action$.pipe(
-    ofType(DeleteShoppingCartItem.type),
+    ofType(deleteShoppingCartItem),
     switchMap((action: ShoppingCartAction) =>
       deleteShoppingCartItemApi(undefined, {
         route: endpoints.DELETE_SHOPPING_CART_ITEM_CART.replace(
@@ -213,11 +209,10 @@ export function deleteShoppingCartItemEpic(action$: ActionsObservable) {
           action.productId
         ),
       }).pipe(
-        map(
-          (shoppingCart: ShoppingCart) =>
-            new DeleteShoppingCartItemSuccess({shoppingCart})
+        map((shoppingCart: ShoppingCart) =>
+          deleteShoppingCartItemSuccess({shoppingCart})
         ),
-        buildCatchError(DeleteShoppingCartItemErrorFn)
+        eCatchError(deleteShoppingCartItemErrorFn)
       )
     )
   );
@@ -226,12 +221,12 @@ export function deleteShoppingCartItemEpic(action$: ActionsObservable) {
 export function calculateEpic(action$: ActionsObservable) {
   return action$.pipe(
     ofType(
-      FetchShoppingCartSuccess.type,
-      AddShoppingCartItemSuccess.type,
-      DeleteShoppingCartItemSuccess.type,
-      updateCartItemSuccess.type
+      fetchShoppingCartSuccess,
+      addShoppingCartItemSuccess,
+      deleteShoppingCartItemSuccess,
+      updateCartItemSuccess
     ),
-    switchMap((action: ShoppingCartAction) =>
+    switchMap(_ =>
       calculateApi().pipe(
         map((pricing: Pricing) => calculateSuccess({pricing})),
         eCatchError(calculateErrorFn)
